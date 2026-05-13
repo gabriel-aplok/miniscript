@@ -1,3 +1,4 @@
+using MiniScript.Errors;
 using MiniScript.Lexer;
 
 namespace MiniScript.Parser;
@@ -172,7 +173,7 @@ public class Parser(List<Token> tokens)
             {
                 return new AssignExpr(v.Name, value);
             }
-            throw new Exception($"Parser error: Invalid assignment target at line {equals.Line}");
+            throw new ParserException(equals, "Invalid assignment target.");
         }
         return expr;
     }
@@ -340,7 +341,7 @@ public class Parser(List<Token> tokens)
             Consume(TokenType.RightParen, "Expect ')' after expression.");
             return expr;
         }
-        throw new Exception($"Parser error at line {Peek().Line}: Unexpected token {Peek().Type}");
+        throw new ParserException(Peek(), $"Unexpected token {Peek().Type}");
     }
 
     private Expr ParseInterpolation(string value)
@@ -382,7 +383,10 @@ public class Parser(List<Token> tokens)
 
                 if (j >= value.Length)
                 {
-                    throw new Exception("parser error: unterminated interpolation inside string.");
+                    throw new ParserException(
+                        Previous(),
+                        "Unterminated interpolation inside string."
+                    );
                 }
 
                 // extract the expression string inside { }
@@ -439,14 +443,12 @@ public class Parser(List<Token> tokens)
 
     private Token Consume(TokenType type, string message)
     {
-        return Check(type)
-            ? Advance()
-            : throw new Exception($"Parser error at line {Peek().Line}: {message}");
+        return Check(type) ? Advance() : throw new ParserException(Peek(), message);
     }
 
     private bool Check(TokenType type)
     {
-        return IsAtEnd() ? false : Peek().Type == type;
+        return !IsAtEnd() && Peek().Type == type;
     }
 
     private Token Advance()

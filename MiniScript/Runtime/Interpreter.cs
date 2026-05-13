@@ -47,17 +47,17 @@ public class Interpreter
 
     public void Interpret(List<Stmt> statements)
     {
-        try
+        // try
+        // {
+        foreach (Stmt stmt in statements)
         {
-            foreach (Stmt stmt in statements)
-            {
-                Execute(stmt);
-            }
+            Execute(stmt);
         }
-        catch (RuntimeException ex)
-        {
-            Console.WriteLine($"Runtime Error [{ex.Token.Line}]: {ex.Message}");
-        }
+        // }
+        // catch (RuntimeException ex)
+        // {
+        //     Console.WriteLine($"Runtime Error [{ex.Token.Line}]: {ex.Message}");
+        // }
     }
 
     private void Execute(Stmt stmt)

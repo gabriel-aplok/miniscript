@@ -17,6 +17,6 @@
 
 ## polish and maintenance
 
-- [ ] improve error messages with visual pointers (^) to the source code
+- [x] improve error messages with visual pointers (^) to the source code
 - [ ] add unit tests for the lexer and parser
 - [ ] document the c# architecture for maintaining the codebase

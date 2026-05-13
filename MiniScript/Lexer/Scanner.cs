@@ -1,4 +1,5 @@
 using System.Globalization;
+using MiniScript.Errors;
 
 namespace MiniScript.Lexer;
 
@@ -129,9 +130,7 @@ public class Scanner(string source)
                 }
                 else
                 {
-                    throw new Exception(
-                        $"Lexer error at line {_line}:{_column}: Unexpected character '{c}'"
-                    );
+                    throw new LexerException(_line, _column, $"Unexpected character '{c}'");
                 }
 
                 break;
@@ -175,7 +174,7 @@ public class Scanner(string source)
             }
             if (_indentStack.Peek() != spaces)
             {
-                throw new Exception($"Lexer error: Inconsistent indentation at line {_line}");
+                throw new LexerException(_line, _column, "Inconsistent indentation");
             }
         }
     }
@@ -194,7 +193,7 @@ public class Scanner(string source)
 
         if (IsAtEnd())
         {
-            throw new Exception($"Lexer error: Unterminated string at line {_line}");
+            throw new LexerException(_line, _column, "Unterminated string");
         }
 
         Advance(); // the closing "
