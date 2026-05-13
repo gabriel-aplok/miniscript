@@ -21,6 +21,10 @@ public record UnaryExpr(Token Operator, Expr Right) : Expr;
 
 public record VariableExpr(Token Name) : Expr;
 
+public record ArrayExpr(List<Expr> Elements) : Expr;
+
+public record IndexExpr(Expr Callee, Token Bracket, Expr Index) : Expr;
+
 // statements
 public abstract record Stmt;
 

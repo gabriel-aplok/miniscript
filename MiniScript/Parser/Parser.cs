@@ -266,17 +266,25 @@ public class Parser(List<Token> tokens)
     private Expr Call()
     {
         Expr expr = Primary();
+
         while (true)
         {
             if (Match(TokenType.LeftParen))
             {
                 expr = FinishCall(expr);
             }
+            else if (Match(TokenType.LeftBracket))
+            {
+                Expr index = Expression();
+                Token bracket = Consume(TokenType.RightBracket, "Expect ']' after index.");
+                expr = new IndexExpr(expr, bracket, index);
+            }
             else
             {
                 break;
             }
         }
+
         return expr;
     }
 
@@ -328,6 +336,21 @@ public class Parser(List<Token> tokens)
 
             // if it's a number
             return new LiteralExpr(prev.Literal);
+        }
+
+        if (Match(TokenType.LeftBracket))
+        {
+            List<Expr> elements = [];
+            if (!Check(TokenType.RightBracket))
+            {
+                do
+                {
+                    elements.Add(Expression());
+                } while (Match(TokenType.Comma));
+            }
+
+            Consume(TokenType.RightBracket, "Expect ']' after array elements.");
+            return new ArrayExpr(elements);
         }
 
         if (Match(TokenType.Identifier))

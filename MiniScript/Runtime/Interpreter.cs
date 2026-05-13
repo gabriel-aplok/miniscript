@@ -43,21 +43,15 @@ public class Interpreter
             "sqrt",
             new BuiltinFunction(1, args => Math.Sqrt(Convert.ToDouble(args[0])))
         );
+        Globals.Define("len", new BuiltinFunction(1, args => ((string)args[0]).Length));
     }
 
     public void Interpret(List<Stmt> statements)
     {
-        // try
-        // {
         foreach (Stmt stmt in statements)
         {
             Execute(stmt);
         }
-        // }
-        // catch (RuntimeException ex)
-        // {
-        //     Console.WriteLine($"Runtime Error [{ex.Token.Line}]: {ex.Message}");
-        // }
     }
 
     private void Execute(Stmt stmt)
@@ -123,6 +117,8 @@ public class Interpreter
     {
         return expr switch
         {
+            ArrayExpr a => EvaluateArray(a),
+            IndexExpr i => EvaluateIndex(i),
             AssignExpr a => EvaluateAssign(a),
             BinaryExpr b => EvaluateBinary(b),
             CallExpr c => EvaluateCall(c),
@@ -133,6 +129,41 @@ public class Interpreter
             InterpolatedStringExpr i => EvaluateInterpolation(i),
             _ => throw new NotImplementedException(),
         };
+    }
+
+    private object? EvaluateArray(ArrayExpr expr)
+    {
+        List<object?> elements = [];
+        foreach (Expr element in expr.Elements)
+        {
+            elements.Add(Evaluate(element));
+        }
+        return elements;
+    }
+
+    private object? EvaluateIndex(IndexExpr expr)
+    {
+        object? callee = Evaluate(expr.Callee);
+        object? indexObj = Evaluate(expr.Index);
+
+        if (callee is List<object?> list)
+        {
+            if (indexObj is double indexDouble)
+            {
+                int index = (int)indexDouble;
+                if (index < 0 || index >= list.Count)
+                {
+                    throw new RuntimeException(
+                        expr.Bracket,
+                        $"Index out of bounds: {index} for list of size {list.Count}"
+                    );
+                }
+                return list[index];
+            }
+            throw new RuntimeException(expr.Bracket, "Index must be a number.");
+        }
+
+        throw new RuntimeException(expr.Bracket, "Only arrays can be indexed.");
     }
 
     private object? EvaluateAssign(AssignExpr a)

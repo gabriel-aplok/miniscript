@@ -58,6 +58,12 @@ public class Scanner(string source)
             case ')':
                 AddToken(TokenType.RightParen);
                 break;
+            case '[':
+                AddToken(TokenType.LeftBracket);
+                break;
+            case ']':
+                AddToken(TokenType.RightBracket);
+                break;
             case ',':
                 AddToken(TokenType.Comma);
                 break;

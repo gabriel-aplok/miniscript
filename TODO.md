@@ -3,7 +3,7 @@
 ## high priority
 
 - [x] add support for logical operators (and, or, not)
-- [ ] implement arrays/lists with index access
+- [x] implement arrays/lists with index access
 - [ ] implement dictionaries (key-value pairs)
 - [ ] add for loops for iterating over collections
 

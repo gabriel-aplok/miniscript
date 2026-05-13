@@ -12,6 +12,8 @@ public enum TokenType
     Slash,
     Modulo,
     Colon,
+    LeftBracket,
+    RightBracket,
 
     // one or two character
     Bang,

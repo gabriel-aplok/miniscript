@@ -15,12 +15,6 @@ print(text)
 print(boolean_true)
 print(null_value)
 
-# print("--- string interpolation ---")
-# print("Hello " + name + "!")
-# print("Your score is " + score)
-# print("Next level in " + (10000 - score) + " points")
-# print("Complex: " + name + " has " + (score * 2) + " points")
-
 print("--- string interpolation test ---")
 print("Hello {name}!")
 print("Your score is {score}")
@@ -97,7 +91,7 @@ print(clock())
 # print("hello " + name)
 
 
-print("--- logical operators ---")
+print("--- logical operators test ---")
 
 var age = 20
 var has_ticket = true
@@ -110,3 +104,19 @@ var restricted = not can_enter
 
 if can_enter or free_entry:
     print("welcome!")
+
+print("--- arrays/lists index access test ---")
+
+var fruits = ["apple", "banana", "cherry"]
+var scores = [10, 20, 30 + 5]
+
+print("first fruit: {fruits[0]}")
+print("second score: {scores[1]}")
+
+var i = 2
+print("dynamic index: {fruits[i]}")
+
+# nesting test
+var matrix = [[1, 2], [3, 4]]
+print("matrix 0,0: {matrix[0][0]}")
+print("matrix 1,0: {matrix[1][0]}")
