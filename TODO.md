@@ -9,7 +9,7 @@
 
 ## cool features to add
 
-- [ ] string interpolation ("hello {name}")
+- [x] string interpolation ("hello {name}")
 - [ ] standard library for math and string manipulation
 - [ ] importing other .ms files to share code
 - [ ] basic class support for object-oriented programming

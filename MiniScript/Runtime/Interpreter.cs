@@ -1,3 +1,4 @@
+using System.Text;
 using MiniScript.Errors;
 using MiniScript.Lexer;
 using MiniScript.Parser;
@@ -129,6 +130,7 @@ public class Interpreter
             LogicalExpr l => EvaluateLogical(l),
             UnaryExpr u => EvaluateUnary(u),
             VariableExpr v => _environment.Get(v.Name),
+            InterpolatedStringExpr i => EvaluateInterpolation(i),
             _ => throw new NotImplementedException(),
         };
     }
@@ -195,6 +197,21 @@ public class Interpreter
             TokenType.Not => !IsTruthy(right),
             _ => null,
         };
+    }
+
+    private object? EvaluateInterpolation(InterpolatedStringExpr expr)
+    {
+        StringBuilder builder = new();
+
+        foreach (Expr part in expr.parts)
+        {
+            object? value = Evaluate(part);
+
+            // convert null to empty string or the word "null" based on preference
+            builder.Append(value?.ToString() ?? "null");
+        }
+
+        return builder.ToString();
     }
 
     private object? EvaluateBinary(BinaryExpr b)

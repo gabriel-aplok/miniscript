@@ -13,6 +13,8 @@ public record CallExpr(Expr Callee, Token Paren, List<Expr> Arguments) : Expr;
 
 public record LiteralExpr(object? Value) : Expr;
 
+public record InterpolatedStringExpr(List<Expr> parts) : Expr;
+
 public record LogicalExpr(Expr Left, Token Operator, Expr Right) : Expr;
 
 public record UnaryExpr(Token Operator, Expr Right) : Expr;

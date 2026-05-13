@@ -312,7 +312,21 @@ public class Parser(List<Token> tokens)
 
         if (Match(TokenType.Number, TokenType.String))
         {
-            return new LiteralExpr(Previous().Literal);
+            Token prev = Previous();
+
+            // if it's a string
+            if (prev.Type == TokenType.String)
+            {
+                string value = (string)prev.Literal!;
+                if (value.Contains('{'))
+                {
+                    return ParseInterpolation(value);
+                }
+                return new LiteralExpr(value);
+            }
+
+            // if it's a number
+            return new LiteralExpr(prev.Literal);
         }
 
         if (Match(TokenType.Identifier))
@@ -329,7 +343,75 @@ public class Parser(List<Token> tokens)
         throw new Exception($"Parser error at line {Peek().Line}: Unexpected token {Peek().Type}");
     }
 
-    // Helpers
+    private Expr ParseInterpolation(string value)
+    {
+        List<Expr> parts = [];
+        int start = 0;
+        int i = 0;
+
+        while (i < value.Length)
+        {
+            if (value[i] == '{')
+            {
+                // add the text before the '{' as a literal
+                if (i > start)
+                {
+                    parts.Add(new LiteralExpr(value[start..i]));
+                }
+
+                // find the matching '}'
+                int j = i + 1;
+                int bracecount = 1;
+                while (j < value.Length && bracecount > 0)
+                {
+                    if (value[j] == '{')
+                    {
+                        bracecount++;
+                    }
+
+                    if (value[j] == '}')
+                    {
+                        bracecount--;
+                    }
+
+                    if (bracecount > 0)
+                    {
+                        j++;
+                    }
+                }
+
+                if (j >= value.Length)
+                {
+                    throw new Exception("parser error: unterminated interpolation inside string.");
+                }
+
+                // extract the expression string inside { }
+                string expressionTtext = value[(i + 1)..j];
+
+                // use a mini-lexer and parser to turn that text into an expression
+                Scanner scanner = new(expressionTtext);
+                List<Token> tokens = scanner.ScanTokens();
+                Parser parser = new(tokens);
+                parts.Add(parser.Expression());
+
+                i = j + 1;
+                start = i;
+            }
+            else
+            {
+                i++;
+            }
+        }
+
+        // remaining text after the last '}'
+        if (start < value.Length)
+        {
+            parts.Add(new LiteralExpr(value[start..]));
+        }
+
+        return new InterpolatedStringExpr(parts);
+    }
+
     private bool Match(params TokenType[] types)
     {
         foreach (TokenType type in types)
