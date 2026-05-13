@@ -71,7 +71,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\MiniScript.Raylib\MiniScript.Raylib.csproj" />
+        <!-- <ProjectReference Include="..\MiniScript.Raylib\MiniScript.Raylib.csproj" /> -->
         <ProjectReference Include="..\MiniScript\MiniScript.csproj" />
     </ItemGroup>
 </Project>

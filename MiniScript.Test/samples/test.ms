@@ -5,6 +5,8 @@ var text = "hello world"
 var boolean_true = true
 var boolean_false = false
 var null_value = null
+var name = "Gabriel"
+var score = 1337
 
 print("--- data types test ---")
 print(integer_number)
@@ -12,6 +14,18 @@ print(decimal_number)
 print(text)
 print(boolean_true)
 print(null_value)
+
+print("--- string interpolation ---")
+print("Hello " + name + "!")
+print("Your score is " + score)
+print("Next level in " + (10000 - score) + " points")
+print("Complex: " + name + " has " + (score * 2) + " points")
+
+# print("--- string interpolation test ---")
+# print("Hello ${name}!")
+# print("Your score is ${score}")
+# print("Next level in ${10000 - score} points")
+# print("Complex: ${name} has ${score * 2} points")
 
 # mathematical operations
 print("--- math test ---")
