@@ -126,6 +126,7 @@ public class Interpreter
             BinaryExpr b => EvaluateBinary(b),
             CallExpr c => EvaluateCall(c),
             LiteralExpr l => l.Value,
+            LogicalExpr l => EvaluateLogical(l),
             UnaryExpr u => EvaluateUnary(u),
             VariableExpr v => _environment.Get(v.Name),
             _ => throw new NotImplementedException(),
@@ -160,6 +161,30 @@ public class Interpreter
         return callable.Call(this, args);
     }
 
+    private object? EvaluateLogical(LogicalExpr expr)
+    {
+        object? left = Evaluate(expr.Left);
+
+        if (expr.Operator.Type == TokenType.Or)
+        {
+            // short-circuit: if left is true, return left
+            if (IsTruthy(left))
+            {
+                return left;
+            }
+        }
+        else // TokenType.And
+        {
+            // short-circuit: if left is false, return left
+            if (!IsTruthy(left))
+            {
+                return left;
+            }
+        }
+
+        return Evaluate(expr.Right);
+    }
+
     private object? EvaluateUnary(UnaryExpr u)
     {
         object? right = Evaluate(u.Right);
@@ -167,6 +192,7 @@ public class Interpreter
         {
             TokenType.Minus => -(double)CheckNumber(u.Operator, right),
             TokenType.Bang => !IsTruthy(right),
+            TokenType.Not => !IsTruthy(right),
             _ => null,
         };
     }

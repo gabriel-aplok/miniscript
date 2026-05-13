@@ -31,6 +31,7 @@ public enum TokenType
     // keywords
     And,
     Or,
+    Not,
     If,
     Else,
     While,

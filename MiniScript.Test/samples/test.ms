@@ -95,3 +95,18 @@ print(clock())
 # print("enter your name:")
 # var name = input()
 # print("hello " + name)
+
+
+print("--- logical operators ---")
+
+var age = 20
+var has_ticket = true
+var is_vip = false
+var is_staff = false
+
+var can_enter = age >= 18 and has_ticket
+var free_entry = is_vip or is_staff
+var restricted = not can_enter
+
+if can_enter or free_entry:
+    print("welcome!")

@@ -15,6 +15,7 @@ public class Scanner(string source)
     {
         { "and", TokenType.And },
         { "or", TokenType.Or },
+        { "not", TokenType.Not },
         { "if", TokenType.If },
         { "else", TokenType.Else },
         { "while", TokenType.While },

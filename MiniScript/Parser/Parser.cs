@@ -162,7 +162,8 @@ public class Parser(List<Token> tokens)
 
     private Expr Assignment()
     {
-        Expr expr = Equality();
+        Expr expr = LogicalOr();
+
         if (Match(TokenType.Equal))
         {
             Token equals = Previous();
@@ -171,8 +172,31 @@ public class Parser(List<Token> tokens)
             {
                 return new AssignExpr(v.Name, value);
             }
-
             throw new Exception($"Parser error: Invalid assignment target at line {equals.Line}");
+        }
+        return expr;
+    }
+
+    private Expr LogicalOr()
+    {
+        Expr expr = LogicalAnd();
+        while (Match(TokenType.Or))
+        {
+            Token op = Previous();
+            Expr right = LogicalAnd();
+            expr = new LogicalExpr(expr, op, right);
+        }
+        return expr;
+    }
+
+    private Expr LogicalAnd()
+    {
+        Expr expr = Equality();
+        while (Match(TokenType.And))
+        {
+            Token op = Previous();
+            Expr right = Equality();
+            expr = new LogicalExpr(expr, op, right);
         }
         return expr;
     }
@@ -229,7 +253,7 @@ public class Parser(List<Token> tokens)
 
     private Expr Unary()
     {
-        if (Match(TokenType.Bang, TokenType.Minus))
+        if (Match(TokenType.Bang, TokenType.Minus, TokenType.Not))
         {
             Token op = Previous();
             Expr right = Unary();
