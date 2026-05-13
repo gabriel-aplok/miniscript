@@ -28,6 +28,7 @@ public class Scanner(string source)
         { "false", TokenType.False },
         { "null", TokenType.Null },
         { "var", TokenType.Var },
+        { "import", TokenType.Import },
     };
 
     public List<Token> ScanTokens()

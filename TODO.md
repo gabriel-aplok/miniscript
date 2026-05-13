@@ -6,6 +6,8 @@
 - [x] implement arrays/lists with index access
 - [x] implement dictionaries (key-value pairs)
 - [x] add for loops for iterating over collections
+- [ ] add garbage collection for memory management
+- [ ] port all the standard library functions from global to do notations
 
 ## cool features to add
 
@@ -13,8 +15,7 @@
 - [x] standard library for math and string manipulation
 - [x] improve standard library to be like functions instead of a weird low level thing (string['trim'](text) -> string.trim(text))
 - [x] implement SetExpr for dot notation next, to treat dictionaries like objects
-- [ ] port all the standard library functions from global to do notations
-- [ ] importing other .ms files to share code
+- [x] importing other .ms files to share code
 - [ ] basic class support for object-oriented programming
 - [ ] a bytecode compiler and virtual machine for better performance (or not, idk, not now)
 

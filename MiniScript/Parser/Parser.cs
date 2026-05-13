@@ -93,6 +93,11 @@ public class Parser(List<Token> tokens)
             return ReturnStatement();
         }
 
+        if (Match(TokenType.Import))
+        {
+            return ImportStatement();
+        }
+
         return ExpressionStatement();
     }
 
@@ -147,6 +152,20 @@ public class Parser(List<Token> tokens)
 
         ConsumeNewlineOrEOF("Expect newline after return value.");
         return new ReturnStmt(keyword, value);
+    }
+
+    private Stmt ImportStatement()
+    {
+        Token keyword = Previous();
+        Token pathToken = Consume(TokenType.String, "Expect string after 'import'.");
+
+        // expect a newline or EOF after the import
+        if (!IsAtEnd())
+        {
+            Consume(TokenType.Newline, "Expect newline after import statement.");
+        }
+
+        return new ImportStmt(keyword, pathToken.Lexeme);
     }
 
     private Stmt ExpressionStatement()

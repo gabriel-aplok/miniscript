@@ -1,3 +1,12 @@
+# ----------------------------------------------------
+# I'm just testing out what I'm adding, sorry for the mass of random things.
+# ----------------------------------------------------
+
+import "utils.ms" # I put samples/ cuz the miniscript executor doesn't recognize the relative path and the script isn't in the same folder.
+
+print(greet("Gabriel"))
+print("Running version: {version}")
+
 # data types and variables
 var integer_number = 10
 var decimal_number = 20.5
@@ -127,10 +136,6 @@ print("dynamic index: {fruits[i]}")
 var matrix = [[1, 2], [3, 4]]
 print("matrix 0,0: {matrix[0][0]}")
 print("matrix 1,0: {matrix[1][0]}")
-
-# len test
-var array = [1, 2, 3, 4, 5]
-print("array length: {len(array)}")
 
 # array modification
 var my_list = [1, 2, 3]

@@ -33,6 +33,8 @@ public record SetExpr(Expr Callee, Token Bracket, Expr Index, Expr Value) : Expr
 
 public record GetExpr(Expr Object, Token Name) : Expr;
 
+public record ImportStmt(Token Keyword, string Path) : Stmt;
+
 // statements
 public abstract record Stmt;
 

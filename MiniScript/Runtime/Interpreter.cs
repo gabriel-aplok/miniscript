@@ -10,6 +10,9 @@ public class Interpreter
     public Environment Globals { get; } = new();
     private Environment _environment;
 
+    private readonly HashSet<string> _importedFiles = [];
+    private string _currentDirectory = Directory.GetCurrentDirectory();
+
     public Interpreter()
     {
         _environment = Globals;
@@ -43,18 +46,19 @@ public class Interpreter
             new BuiltinFunction(0, _ => DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() / 1000.0)
         );
 
-#pragma warning disable CS8600
-#pragma warning disable CS8602
-        Globals.Define("len", new BuiltinFunction(1, args => ((List<object?>)args[0]).Count));
-#pragma warning restore CS8602
-#pragma warning restore CS8600
-
-        // Inject our new standard libraries
         StandardLibrary.Inject(this);
     }
 
-    public void Interpret(List<Stmt> statements)
+    public void Run(List<Stmt> statements, string? path = null)
     {
+        _currentDirectory = Directory.GetCurrentDirectory();
+
+        if (path != null)
+        {
+            _currentDirectory =
+                Path.GetDirectoryName(Path.GetFullPath(path)) ?? Directory.GetCurrentDirectory();
+        }
+
         foreach (Stmt stmt in statements)
         {
             Execute(stmt);
@@ -65,6 +69,9 @@ public class Interpreter
     {
         switch (stmt)
         {
+            case ImportStmt i:
+                ExecuteImport(i);
+                break;
             case BlockStmt b:
                 ExecuteBlock(b, new Environment(_environment));
                 break;
@@ -102,6 +109,62 @@ public class Interpreter
             case ForStmt f:
                 ExecuteFor(f);
                 break;
+        }
+    }
+
+    private void ExecuteImport(ImportStmt stmt)
+    {
+        // resolve the path
+        string cleanPath = stmt.Path.Trim('"');
+        string fullPath = Path.GetFullPath(Path.Combine(_currentDirectory, cleanPath));
+        fullPath = Path.GetFullPath(fullPath);
+
+        if (!File.Exists(fullPath))
+        {
+            throw new RuntimeException(
+                stmt.Keyword,
+                $"the file {stmt.Path} could not be found in {fullPath}"
+            );
+        }
+
+        if (_importedFiles.Contains(fullPath))
+        {
+            return;
+        }
+
+        _importedFiles.Add(fullPath);
+
+        string source = File.ReadAllText(fullPath);
+
+        // saves the previous directory for later restoration (in case the import contains other imports).
+        string previousDir = _currentDirectory;
+        _currentDirectory = Path.GetDirectoryName(fullPath)!;
+
+        try
+        {
+            Scanner scanner = new(source);
+            List<Token> tokens = scanner.ScanTokens();
+            Parser.Parser parser = new(tokens);
+            List<Stmt> statements = parser.Parse();
+
+            Environment previousEnv = _environment;
+            _environment = Globals;
+
+            try
+            {
+                foreach (Stmt s in statements)
+                {
+                    Execute(s);
+                }
+            }
+            finally
+            {
+                _environment = previousEnv;
+            }
+        }
+        finally
+        {
+            _currentDirectory = previousDir; // restore the original directory
         }
     }
 
@@ -429,6 +492,14 @@ public class Interpreter
                 "contains" => new BuiltinFunction(
                     1,
                     args => str.Contains(args[0]?.ToString() ?? "")
+                ),
+                "split" => new BuiltinFunction(
+                    1,
+                    args => str.Split(args[0]?.ToString() ?? "").Cast<object?>().ToList()
+                ),
+                "replace" => new BuiltinFunction(
+                    2,
+                    args => str.Replace(args[0]?.ToString() ?? "", args[1]?.ToString() ?? "")
                 ),
                 _ => throw new RuntimeException(
                     expr.Name,

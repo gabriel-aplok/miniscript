@@ -54,4 +54,7 @@ public enum TokenType
     Dedent,
     Newline,
     EOF,
+
+    // Special
+    Import,
 }

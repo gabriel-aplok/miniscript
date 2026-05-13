@@ -1,4 +1,5 @@
-﻿using MiniScript.Errors;
+﻿using System.Text;
+using MiniScript.Errors;
 using MiniScript.Lexer;
 using MiniScript.Parser;
 using MiniScript.Runtime;
@@ -8,70 +9,158 @@ namespace MiniScript.Test;
 public class Program
 {
     private static readonly Interpreter _interpreter = new();
+    private static bool _hadError = false;
+    private static readonly bool _hadRuntimeError = false;
 
-    public static void Main(string[] args)
+    public static int Main(string[] args)
     {
-        if (args.Length > 1)
+        Console.OutputEncoding = Encoding.UTF8;
+
+        // handle no arguments
+        if (args.Length == 0)
         {
-            Console.WriteLine("Usage: MiniScript.exe script.ms");
-            System.Environment.Exit(64);
+            // if a default test file exists, run it, otherwise start REPL
+            if (File.Exists("samples/test.ms"))
+            {
+                RunFile("samples/test.ms");
+            }
+            else
+            {
+                RunPrompt();
+            }
+
+            return 0;
         }
-        else if (args.Length == 1)
+
+        // parse arguments properly
+        string? filePath = null;
+        bool startRepl = false;
+
+        foreach (string arg in args)
         {
-            RunFile(args[0]);
+            switch (arg)
+            {
+                case "-r":
+                case "--repl":
+                    startRepl = true;
+                    break;
+                case "-h":
+                case "--help":
+                    PrintUsage();
+                    return 0;
+                default:
+                    if (!arg.StartsWith('-'))
+                    {
+                        filePath = arg;
+                    }
+
+                    break;
+            }
+        }
+
+        // execution priority
+        if (startRepl)
+        {
+            RunPrompt();
+        }
+        else if (filePath != null)
+        {
+            RunFile(filePath);
         }
         else
         {
-            // just to test lol RunPrompt();
-            RunFile("samples/test.ms");
+            Console.Error.WriteLine("Error: No script file provided and REPL flag not set.");
+            PrintUsage();
+            return 64;
         }
+
+        return _hadError ? 65 : (_hadRuntimeError ? 70 : 0);
+    }
+
+    private static void PrintUsage()
+    {
+        Console.WriteLine("MiniScript Language Tool");
+        Console.WriteLine("Usage: MiniScript [script.ms] [options]");
+        Console.WriteLine("\nOptions:");
+        Console.WriteLine("  -r, --repl    Start interactive mode");
+        Console.WriteLine("  -h, --help    Show this help message");
     }
 
     private static void RunFile(string path)
     {
-        string source = File.ReadAllText(path);
-        Run(source);
+        if (!File.Exists(path))
+        {
+            Console.Error.WriteLine($"Error: File not found at '{path}'");
+            return;
+        }
+
+        try
+        {
+            string source = File.ReadAllText(path);
+            Run(source, path);
+        }
+        catch (IOException e)
+        {
+            Console.Error.WriteLine($"Error reading file: {e.Message}");
+        }
     }
 
     private static void RunPrompt()
     {
-        Console.WriteLine("MiniScript REPL");
-        Console.WriteLine(
-            "Note: Single-line statements only in REPL. Blocks (if/func/while) require file execution."
-        );
+        Console.Clear();
+        Console.WriteLine("MiniScript REPL (Version 1.0)");
+        Console.WriteLine("Type 'exit()' or press Ctrl+C to quit.");
+        Console.WriteLine("-------------------------------------");
 
         while (true)
         {
-            Console.Write("> ");
+            _hadError = false; // reset error flag so REPL doesn't die
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write("ms > ");
+            Console.ResetColor();
+
             string? line = Console.ReadLine();
-            if (line == null)
+            if (line == null || line.Trim() == "exit()")
             {
                 break;
             }
 
-            Run(line);
+            Run(line, "repl");
         }
     }
 
-    private static void Run(string source)
+    private static void Run(string source, string? path = null)
     {
         try
         {
+            // lexing
             Scanner scanner = new(source);
             List<Token> tokens = scanner.ScanTokens();
 
+            // parsing
             Parser.Parser parser = new(tokens);
             List<Stmt> statements = parser.Parse();
 
-            _interpreter.Interpret(statements);
+            // stop if there was a syntax error
+            if (_hadError)
+            {
+                return;
+            }
+
+            // execution
+            _interpreter.Run(statements, path);
         }
         catch (MiniScriptException ex)
         {
             ReportError(source, ex);
+            _hadError = true;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Unexpected System Error: {ex.Message}");
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.WriteLine($"\n[Internal System Error]: {ex.Message}");
+            Console.WriteLine(ex.StackTrace);
+            Console.ResetColor();
         }
     }
 
@@ -79,32 +168,34 @@ public class Program
     {
         string errorType = ex switch
         {
-            LexerException => "Lexer Error",
-            ParserException => "Parser Error",
+            LexerException => "Lexical Error",
+            ParserException => "Syntax Error",
             RuntimeException => "Runtime Error",
             _ => "Error",
         };
 
         Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine($"\n[{errorType}] Line {ex.Line}:{ex.Column} -> {ex.Message}");
+        Console.WriteLine($"\n[{errorType}] {ex.Message}");
         Console.ResetColor();
 
-        // split source to find the specific line text
-        string[] lines = source.Split('\n');
-        if (ex.Line <= lines.Length)
-        {
-            // replace carriage returns for clean printing
-            string errorLine = lines[ex.Line - 1].Replace("\r", "");
-            Console.WriteLine(errorLine);
+        string[] lines = source.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
 
-            // create the pointer string: spaces up to the column, then the pointer
-            // column is 1-based, so I need to use (column - 1) spaces
-            string pointer = new string(' ', ex.Column - 1) + "^";
+        if (ex.Line > 0 && ex.Line <= lines.Length)
+        {
+            string errorLine = lines[ex.Line - 1];
+            Console.WriteLine($"  Line {ex.Line}: {errorLine}");
+
+            // caret pointer
+            // handle tab characters by replicating them in the pointer string
+            StringBuilder pointer = new StringBuilder("          "); // offset for "Line X: "
+            for (int i = 0; i < ex.Column - 1; i++)
+            {
+                pointer.Append(errorLine[i] == '\t' ? '\t' : ' ');
+            }
 
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine(pointer);
+            Console.WriteLine(pointer.ToString() + "^--- here");
             Console.ResetColor();
         }
-        Console.WriteLine();
     }
 }
