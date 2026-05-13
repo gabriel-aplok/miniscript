@@ -91,6 +91,9 @@ print(clock())
 # print("hello " + name)
 
 
+# ----------------------------------------------------
+# logical operators test
+# ----------------------------------------------------
 print("--- logical operators test ---")
 
 var age = 20
@@ -105,6 +108,10 @@ var restricted = not can_enter
 if can_enter or free_entry:
     print("welcome!")
 
+
+# ----------------------------------------------------
+# arrays and lists test
+# ----------------------------------------------------
 print("--- arrays/lists index access test ---")
 
 var fruits = ["apple", "banana", "cherry"]
@@ -130,6 +137,10 @@ var my_list = [1, 2, 3]
 my_list[0] = 100
 print("list item: {my_list[0]}") # should print 100
 
+
+# ----------------------------------------------------
+# dictionaries test
+# ----------------------------------------------------
 print("--- dictionaries test ---")
 
 # dictionary usage
@@ -149,6 +160,10 @@ print("current health: {player['health']}")
 player["mana"] = 50
 print("mana added: {player['mana']}")
 
+
+# ----------------------------------------------------
+# for loops test
+# ----------------------------------------------------
 print("--- for loops test ---")
 
 # iterating over an array
@@ -171,3 +186,31 @@ for key in stats:
 var word = "mini"
 for letter in word:
     print("Letter: {letter}")
+
+
+# ----------------------------------------------------
+# standard library tests
+# ----------------------------------------------------
+print("--- math library test ---")
+print("PI: {math['pi']}")
+print("Absolute: {math['abs'](-15)}")
+print("Floor: {math['floor'](4.8)}")
+print("Ceil: {math['ceil'](4.2)}")
+print("Pow: {math['pow'](2, 3)}")
+
+print("--- string library test ---")
+var text = "  MiniScript is awesome!  "
+
+print("Original: '{text}'")
+print("Trimmed: '{string['trim'](text)}'")
+print("Upper: {string['to_upper'](text)}")
+
+var clean_text = string['trim'](text)
+print("Replace: {string['replace'](clean_text, 'awesome', 'powerful')}")
+print("Contains 'Script': {string['contains'](clean_text, 'Script')}")
+
+# split returns an array, so we can iterate over it!
+print("--- split test ---")
+var words = string['split'](clean_text, " ")
+for word in words:
+    print("Word: {word}")

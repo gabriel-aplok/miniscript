@@ -13,7 +13,8 @@ public class Interpreter
     public Interpreter()
     {
         _environment = Globals;
-        // inject built-ins
+
+        // Base Global Functions
         Globals.Define(
             "print",
             new BuiltinFunction(
@@ -25,6 +26,7 @@ public class Interpreter
                 }
             )
         );
+
         Globals.Define(
             "input",
             new BuiltinFunction(
@@ -35,19 +37,20 @@ public class Interpreter
                 }
             )
         );
+
         Globals.Define(
             "clock",
             new BuiltinFunction(0, _ => DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() / 1000.0)
         );
-        Globals.Define(
-            "sqrt",
-            new BuiltinFunction(1, args => Math.Sqrt(Convert.ToDouble(args[0])))
-        );
-#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
+
+#pragma warning disable CS8600
+#pragma warning disable CS8602
         Globals.Define("len", new BuiltinFunction(1, args => ((List<object?>)args[0]).Count));
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+#pragma warning restore CS8602
+#pragma warning restore CS8600
+
+        // Inject our new standard libraries
+        StandardLibrary.Inject(this);
     }
 
     public void Interpret(List<Stmt> statements)
@@ -312,9 +315,11 @@ public class Interpreter
         Dictionary<object, object?> dict = [];
         foreach (KeyValuePair<Expr, Expr> entry in expr.Entries)
         {
+#pragma warning disable CS8625
             object? key =
                 Evaluate(entry.Key)
                 ?? throw new RuntimeException(null, "Dictionary key cannot be null.");
+#pragma warning restore CS8625
             dict[key] = Evaluate(entry.Value);
         }
         return dict;
