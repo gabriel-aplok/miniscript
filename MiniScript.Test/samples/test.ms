@@ -130,20 +130,21 @@ var my_list = [1, 2, 3]
 my_list[0] = 100
 print("list item: {my_list[0]}") # should print 100
 
+print("--- dictionaries test ---")
+
 # dictionary usage
-# [Parser Error] Line 134:16 -> Unexpected token Newline
-# var player = {
-#     "name": "gabriel",
-#     "health": 100,
-#     "inventory": ["item1", "item2", "item3"]
-# }
+var player = {
+    "name": "gabriel",
+    "health": 100,
+    "inventory": ["item1", "item2", "item3"]
+}
 
-# print("welcome {player["name"]}")
+print("welcome {player['name']}")
 
-# # dictionary modification
-# player["health"] = player["health"] - 20
-# print("current health: {player["health"]}")
+# dictionary modification
+player["health"] = player["health"] - 20
+print("current health: {player['health']}")
 
-# # adding new keys
-# player["mana"] = 50
-# print("mana added: {player["mana"]}")
+# adding new keys
+player["mana"] = 50
+print("mana added: {player['mana']}")

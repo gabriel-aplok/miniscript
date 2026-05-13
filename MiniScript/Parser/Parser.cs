@@ -350,14 +350,19 @@ public class Parser(List<Token> tokens)
         if (Match(TokenType.LeftBracket))
         {
             List<Expr> elements = [];
+            ConsumeIgnorable(); // skip potential newline/indent after '['
+
             if (!Check(TokenType.RightBracket))
             {
                 do
                 {
+                    ConsumeIgnorable(); // skip potential newline before element
                     elements.Add(Expression());
+                    ConsumeIgnorable(); // skip potential newline after element
                 } while (Match(TokenType.Comma));
             }
 
+            ConsumeIgnorable(); //sip potential newline before ']'
             Consume(TokenType.RightBracket, "Expect ']' after array elements.");
             return new ArrayExpr(elements);
         }
@@ -365,17 +370,27 @@ public class Parser(List<Token> tokens)
         if (Match(TokenType.LeftBrace))
         {
             Dictionary<Expr, Expr> entries = [];
+            ConsumeIgnorable(); //  skip potential newline/indent after '{'
+
             if (!Check(TokenType.RightBrace))
             {
                 do
                 {
+                    ConsumeIgnorable(); // sskip potential newline before key
                     Expr key = Expression();
+
+                    ConsumeIgnorable();
                     Consume(TokenType.Colon, "Expect ':' after dictionary key.");
+
+                    ConsumeIgnorable();
                     Expr val = Expression();
+
+                    ConsumeIgnorable();
                     entries.Add(key, val);
                 } while (Match(TokenType.Comma));
             }
 
+            ConsumeIgnorable(); // skip potential newline before '}'
             Consume(TokenType.RightBrace, "Expect '}' after dictionary entries.");
             return new DictionaryExpr(entries);
         }
@@ -494,6 +509,14 @@ public class Parser(List<Token> tokens)
     private Token Consume(TokenType type, string message)
     {
         return Check(type) ? Advance() : throw new ParserException(Peek(), message);
+    }
+
+    private void ConsumeIgnorable()
+    {
+        while (Match(TokenType.Newline, TokenType.Indent, TokenType.Dedent))
+        {
+            // skip formatting tokens inside collections
+        }
     }
 
     private bool Check(TokenType type)

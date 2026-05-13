@@ -129,7 +129,10 @@ public class Scanner(string source)
                 HandleNewline();
                 break;
             case '"':
-                LexString();
+                LexString('"');
+                break;
+            case '\'':
+                LexString('\'');
                 break;
             default:
                 if (char.IsDigit(c))
@@ -191,9 +194,9 @@ public class Scanner(string source)
         }
     }
 
-    private void LexString()
+    private void LexString(char quoteType)
     {
-        while (Peek() != '"' && !IsAtEnd())
+        while (Peek() != quoteType && !IsAtEnd())
         {
             if (Peek() == '\n')
             {
