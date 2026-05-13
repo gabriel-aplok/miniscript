@@ -195,6 +195,7 @@ public class Interpreter
             IndexExpr i => EvaluateIndex(i),
             DictionaryExpr d => EvaluateDictionary(d),
             SetExpr s => EvaluateSet(s),
+            GetExpr g => EvaluateGet(g),
             _ => throw new NotImplementedException(),
         };
     }
@@ -352,6 +353,28 @@ public class Interpreter
         throw new RuntimeException(
             expr.Bracket,
             "Only arrays and dictionaries support index assignment."
+        );
+    }
+
+    private object? EvaluateGet(GetExpr expr)
+    {
+        object? obj = Evaluate(expr.Object);
+
+        if (obj is Dictionary<object, object?> dict)
+        {
+            if (dict.TryGetValue(expr.Name.Lexeme, out var value))
+            {
+                return value;
+            }
+            throw new RuntimeException(
+                expr.Name,
+                $"Property '{expr.Name.Lexeme}' not found in dictionary."
+            );
+        }
+
+        throw new RuntimeException(
+            expr.Name,
+            "Only dictionaries (and modules) support dot notation access."
         );
     }
 

@@ -3,6 +3,7 @@ namespace MiniScript.Lexer;
 public enum TokenType
 {
     // single-character
+    Dot,
     LeftParen,
     RightParen,
     Comma,

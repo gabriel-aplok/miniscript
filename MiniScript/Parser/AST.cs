@@ -29,6 +29,8 @@ public record DictionaryExpr(Dictionary<Expr, Expr> Entries) : Expr;
 
 public record SetExpr(Expr Callee, Token Bracket, Expr Index, Expr Value) : Expr;
 
+public record GetExpr(Expr Object, Token Name) : Expr;
+
 // statements
 public abstract record Stmt;
 

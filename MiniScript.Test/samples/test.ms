@@ -214,3 +214,22 @@ print("--- split test ---")
 var words = string['split'](clean_text, " ")
 for word in words:
     print("Word: {word}")
+
+
+# ----------------------------------------------------
+# high level stdlib tests
+# ----------------------------------------------------
+print("--- high level stdlib test ---")
+
+var text = "  hello world  "
+var clean = string.trim(text)
+print(string.to_upper(clean))
+
+var radius = 5
+var area = math.pi * math.pow(radius, 2)
+print("Area: {area}")
+
+# can even mix them
+var items = string.split(string.trim("a, b, c"), ", ")
+for item in items:
+    print("Item: {item}")

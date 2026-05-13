@@ -305,6 +305,11 @@ public class Parser(List<Token> tokens)
                 Token bracket = Consume(TokenType.RightBracket, "Expect ']' after index.");
                 expr = new IndexExpr(expr, bracket, index);
             }
+            else if (Match(TokenType.Dot))
+            {
+                Token name = Consume(TokenType.Identifier, "Expect property name after '.'.");
+                expr = new GetExpr(expr, name);
+            }
             else
             {
                 break;

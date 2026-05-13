@@ -54,6 +54,9 @@ public class Scanner(string source)
         char c = Advance();
         switch (c)
         {
+            case '.':
+                AddToken(TokenType.Dot);
+                break;
             case '(':
                 AddToken(TokenType.LeftParen);
                 break;

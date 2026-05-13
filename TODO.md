@@ -11,7 +11,7 @@
 
 - [x] string interpolation ("hello {name}")
 - [x] standard library for math and string manipulation
-- [ ] improve standard library to be like functions instead of a weird low level thing (string['trim'](text) -> string.trim(text))
+- [x] improve standard library to be like functions instead of a weird low level thing (string['trim'](text) -> string.trim(text))
 - [ ] importing other .ms files to share code
 - [ ] basic class support for object-oriented programming
 - [ ] a bytecode compiler and virtual machine for better performance (or not, idk)
