@@ -83,6 +83,11 @@ public class Parser(List<Token> tokens)
             return WhileStatement();
         }
 
+        if (Match(TokenType.For))
+        {
+            return ForStatement();
+        }
+
         if (Match(TokenType.Return))
         {
             return ReturnStatement();
@@ -117,6 +122,18 @@ public class Parser(List<Token> tokens)
         Consume(TokenType.Newline, "Expect newline after ':'.");
         Stmt body = Block();
         return new WhileStmt(condition, body);
+    }
+
+    private Stmt ForStatement()
+    {
+        Token variable = Consume(TokenType.Identifier, "Expect variable name after 'for'.");
+        Consume(TokenType.In, "Expect 'in' after for loop variable.");
+        Expr iterable = Expression();
+        Consume(TokenType.Colon, "Expect ':' after for loop iterable.");
+        Consume(TokenType.Newline, "Expect newline after ':'.");
+        Stmt body = Block();
+
+        return new ForStmt(variable, iterable, body);
     }
 
     private Stmt ReturnStatement()

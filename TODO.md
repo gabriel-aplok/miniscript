@@ -4,8 +4,8 @@
 
 - [x] add support for logical operators (and, or, not)
 - [x] implement arrays/lists with index access
-- [ ] implement dictionaries (key-value pairs)
-- [ ] add for loops for iterating over collections
+- [x] implement dictionaries (key-value pairs)
+- [x] add for loops for iterating over collections
 
 ## cool features to add
 

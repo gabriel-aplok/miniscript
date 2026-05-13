@@ -148,3 +148,26 @@ print("current health: {player['health']}")
 # adding new keys
 player["mana"] = 50
 print("mana added: {player['mana']}")
+
+print("--- for loops test ---")
+
+# iterating over an array
+var heroes = ["batman", "superman", "wonder woman"]
+for hero in heroes:
+    print("Hero: {hero}")
+
+# iterating over a dictionary (iterates keys)
+var stats = {
+    "strength": 99,
+    "agility": 85,
+    "intelligence": 90
+}
+
+print("Stats:")
+for key in stats:
+    print("- {key}: {stats[key]}")
+
+# iterating over a string
+var word = "mini"
+for letter in word:
+    print("Letter: {letter}")

@@ -95,8 +95,67 @@ public class Interpreter
                 {
                     Execute(w.Body);
                 }
-
                 break;
+            case ForStmt f:
+                ExecuteFor(f);
+                break;
+        }
+    }
+
+    private void ExecuteFor(ForStmt stmt)
+    {
+        object? iterable = Evaluate(stmt.Iterable);
+
+        if (iterable is List<object?> list)
+        {
+            foreach (object? item in list)
+            {
+                ExecuteForIteration(stmt.Variable, item, stmt.Body);
+            }
+        }
+        else if (iterable is Dictionary<object, object?> dict)
+        {
+            // by default, iterating a dictionary gives you the keys
+            foreach (object key in dict.Keys)
+            {
+                ExecuteForIteration(stmt.Variable, key, stmt.Body);
+            }
+        }
+        else if (iterable is string str)
+        {
+            // iterating over a string gives you each character as a string
+            foreach (char c in str)
+            {
+                ExecuteForIteration(stmt.Variable, c.ToString(), stmt.Body);
+            }
+        }
+        else
+        {
+            // to get the token for the error, I could pass it in the AST,
+            // but I can just use the variable token for position info
+            throw new RuntimeException(
+                stmt.Variable,
+                "Target is not iterable. You can only iterate over arrays, dictionaries, and strings."
+            );
+        }
+    }
+
+    private void ExecuteForIteration(Token variable, object? value, Stmt body)
+    {
+        // Create a new environment for EACH iteration so the loop variable
+        // doesn't leak into the global scope or get mixed up.
+        Environment iterationEnv = new(_environment);
+        iterationEnv.Define(variable.Lexeme, value);
+
+        Environment previous = _environment;
+        try
+        {
+            _environment = iterationEnv;
+            Execute(body);
+        }
+        finally
+        {
+            _environment = previous;
         }
     }
 
@@ -238,7 +297,7 @@ public class Interpreter
         }
         if (callee is Dictionary<object, object?> dict)
         {
-            if (index != null && dict.TryGetValue(index, out var value))
+            if (index != null && dict.TryGetValue(index, out object? value))
             {
                 return value;
             }

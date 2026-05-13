@@ -39,6 +39,8 @@ public enum TokenType
     If,
     Else,
     While,
+    For,
+    In,
     Func,
     Return,
     True,

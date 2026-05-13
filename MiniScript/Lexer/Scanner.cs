@@ -19,6 +19,8 @@ public class Scanner(string source)
         { "not", TokenType.Not },
         { "if", TokenType.If },
         { "else", TokenType.Else },
+        { "for", TokenType.For },
+        { "in", TokenType.In },
         { "while", TokenType.While },
         { "func", TokenType.Func },
         { "return", TokenType.Return },
