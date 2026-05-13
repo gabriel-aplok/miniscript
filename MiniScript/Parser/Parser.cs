@@ -38,7 +38,7 @@ public class Parser(List<Token> tokens)
         return Statement();
     }
 
-    private Stmt FunctionDeclaration()
+    private FunctionStmt FunctionDeclaration()
     {
         Token name = Consume(TokenType.Identifier, "Expect function name.");
         Consume(TokenType.LeftParen, "Expect '(' after function name.");
@@ -58,7 +58,7 @@ public class Parser(List<Token> tokens)
         return new FunctionStmt(name, parameters, body);
     }
 
-    private Stmt VarDeclaration()
+    private VarStmt VarDeclaration()
     {
         Token name = Consume(TokenType.Identifier, "Expect variable name.");
         Expr? initializer = null;
@@ -98,6 +98,11 @@ public class Parser(List<Token> tokens)
             return TryStatement();
         }
 
+        if (Match(TokenType.Throw))
+        {
+            return ThrowStatement();
+        }
+
         if (Match(TokenType.Import))
         {
             return ImportStatement();
@@ -106,7 +111,7 @@ public class Parser(List<Token> tokens)
         return ExpressionStatement();
     }
 
-    private Stmt IfStatement()
+    private IfStmt IfStatement()
     {
         Expr condition = Expression();
         Consume(TokenType.Colon, "Expect ':' after if condition.");
@@ -125,7 +130,7 @@ public class Parser(List<Token> tokens)
         return new IfStmt(condition, thenBranch, elseBranch);
     }
 
-    private Stmt WhileStatement()
+    private WhileStmt WhileStatement()
     {
         Expr condition = Expression();
         Consume(TokenType.Colon, "Expect ':' after while condition.");
@@ -134,7 +139,7 @@ public class Parser(List<Token> tokens)
         return new WhileStmt(condition, body);
     }
 
-    private Stmt ForStatement()
+    private ForStmt ForStatement()
     {
         Token variable = Consume(TokenType.Identifier, "Expect variable name after 'for'.");
         Consume(TokenType.In, "Expect 'in' after for loop variable.");
@@ -146,7 +151,7 @@ public class Parser(List<Token> tokens)
         return new ForStmt(variable, iterable, body);
     }
 
-    private Stmt ReturnStatement()
+    private ReturnStmt ReturnStatement()
     {
         Token keyword = Previous();
         Expr? value = null;
@@ -159,28 +164,53 @@ public class Parser(List<Token> tokens)
         return new ReturnStmt(keyword, value);
     }
 
-    private Stmt TryStatement()
+    private TryStmt TryStatement()
     {
         Consume(TokenType.Colon, "Expect ':' after 'try'.");
         Consume(TokenType.Newline, "Expect newline after ':'.");
         Stmt tryBlock = Block();
 
-        Consume(TokenType.Catch, "Expect 'catch' after try block.");
-
+        Stmt? catchBlock = null;
         Token? errorVar = null;
-        if (Match(TokenType.Identifier))
+
+        if (Match(TokenType.Catch))
         {
-            errorVar = Previous();
+            if (Match(TokenType.Identifier))
+            {
+                errorVar = Previous();
+            }
+
+            Consume(TokenType.Colon, "Expect ':' after catch.");
+            Consume(TokenType.Newline, "Expect newline after ':'.");
+            catchBlock = Block();
         }
 
-        Consume(TokenType.Colon, "Expect ':' after catch.");
-        Consume(TokenType.Newline, "Expect newline after ':'.");
-        Stmt catchBlock = Block();
+        Stmt? finallyBlock = null;
+        if (Match(TokenType.Finally))
+        {
+            Consume(TokenType.Colon, "Expect ':' after finally.");
+            Consume(TokenType.Newline, "Expect newline after ':'.");
+            finallyBlock = Block();
+        }
 
-        return new TryStmt(tryBlock, errorVar, catchBlock);
+        return new TryStmt(tryBlock, errorVar, catchBlock, finallyBlock);
     }
 
-    private Stmt ImportStatement()
+    private ThrowStmt ThrowStatement()
+    {
+        Token keyword = Previous();
+        Expr value = Expression();
+
+        Consume(TokenType.Newline, "Expect newline after throw statement.");
+        // if (!IsAtEnd() && Check(TokenType.Newline))
+        // {
+        //     Advance();
+        // }
+
+        return new ThrowStmt(keyword, value);
+    }
+
+    private ImportStmt ImportStatement()
     {
         Token keyword = Previous();
         Token pathToken = Consume(TokenType.String, "Expect string after 'import'.");
@@ -194,14 +224,14 @@ public class Parser(List<Token> tokens)
         return new ImportStmt(keyword, pathToken.Lexeme);
     }
 
-    private Stmt ExpressionStatement()
+    private ExpressionStmt ExpressionStatement()
     {
         Expr expr = Expression();
         ConsumeNewlineOrEOF("Expect newline after expression.");
         return new ExpressionStmt(expr);
     }
 
-    private Stmt Block()
+    private BlockStmt Block()
     {
         Consume(TokenType.Indent, "Expect indentation before block.");
         List<Stmt> statements = [];

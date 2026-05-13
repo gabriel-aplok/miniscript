@@ -30,6 +30,8 @@ public class Scanner(string source)
         { "var", TokenType.Var },
         { "try", TokenType.Try },
         { "catch", TokenType.Catch },
+        { "finally", TokenType.Finally },
+        { "throw", TokenType.Throw },
         { "import", TokenType.Import },
     };
 

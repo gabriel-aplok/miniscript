@@ -50,6 +50,8 @@ public enum TokenType
     Var,
     Try,
     Catch,
+    Finally,
+    Throw,
 
     // formatting & structure
     Indent,

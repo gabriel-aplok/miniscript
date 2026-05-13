@@ -112,6 +112,9 @@ public class Interpreter
             case TryStmt t:
                 ExecuteTry(t);
                 break;
+            case ThrowStmt s:
+                ExecuteThrow(s);
+                break;
         }
     }
 
@@ -179,26 +182,46 @@ public class Interpreter
         }
         catch (RuntimeException ex)
         {
-            // creates a new scope for the catch block.
-            Environment catchEnv = new(_environment);
+            if (stmt.CatchBlock != null)
+            {
+                Environment catchEnv = new Environment(_environment);
+                if (stmt.ErrorVar != null)
+                {
+                    catchEnv.Define(stmt.ErrorVar.Lexeme, ex.Message);
+                }
 
-            if (stmt.ErrorVar != null)
-            {
-                // define the error variable with the exception message.
-                catchEnv.Define(stmt.ErrorVar.Lexeme, ex.Message);
+                Environment previous = _environment;
+                try
+                {
+                    _environment = catchEnv;
+                    Execute(stmt.CatchBlock);
+                }
+                finally
+                {
+                    _environment = previous;
+                }
             }
-
-            Environment previous = _environment;
-            try
+            else
             {
-                _environment = catchEnv;
-                Execute(stmt.CatchBlock);
-            }
-            finally
-            {
-                _environment = previous;
+                // if there is no catch block, pass the error to C# to process the finally block
+                // and then throw the error
+                throw;
             }
         }
+        finally
+        {
+            if (stmt.FinallyBlock != null)
+            {
+                Execute(stmt.FinallyBlock);
+            }
+        }
+    }
+
+    private void ExecuteThrow(ThrowStmt stmt)
+    {
+        object? value = Evaluate(stmt.Expression);
+        // transform any value from MiniScript into an error message.
+        throw new RuntimeException(stmt.Keyword, value?.ToString() ?? "Unknown error");
     }
 
     private void ExecuteFor(ForStmt stmt)

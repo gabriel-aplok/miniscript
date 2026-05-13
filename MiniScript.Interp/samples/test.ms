@@ -287,4 +287,24 @@ try:
 catch err:
     print("Import error: {err}")
 
+
+func check_level(lvl):
+    if lvl < 0:
+        throw "Level cannot be negative!"
+    return "Level is {lvl}"
+
+try:
+    print(check_level(-5)) # -5 to trigger error
+catch e:
+    print("caught an error: {e}")
+finally:
+    print("this will always run, no matter what.")
+
+# try without catch, only with finally.
+try:
+    print("doing something dangerous...")
+finally:
+    print("cleaning up resources...")
+
+
 print("the program continued running fine!")
