@@ -27,6 +27,8 @@ public record IndexExpr(Expr Callee, Token Bracket, Expr Index) : Expr;
 
 public record DictionaryExpr(Dictionary<Expr, Expr> Entries) : Expr;
 
+public record SetPropertyExpr(Expr Object, Token Name, Expr Value) : Expr;
+
 public record SetExpr(Expr Callee, Token Bracket, Expr Index, Expr Value) : Expr;
 
 public record GetExpr(Expr Object, Token Name) : Expr;

@@ -192,10 +192,16 @@ public class Parser(List<Token> tokens)
                 return new AssignExpr(v.Name, value);
             }
 
-            // handle index assignment: arr[index] = value
+            // arr[index] = value
             if (expr is IndexExpr i)
             {
                 return new SetExpr(i.Callee, i.Bracket, i.Index, value);
+            }
+
+            // object.property = value
+            if (expr is GetExpr g)
+            {
+                return new SetPropertyExpr(g.Object, g.Name, value);
             }
 
             throw new ParserException(equals, "Invalid assignment target.");

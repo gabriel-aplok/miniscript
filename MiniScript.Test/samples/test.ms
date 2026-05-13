@@ -233,3 +233,34 @@ print("Area: {area}")
 var items = string.split(string.trim("a, b, c"), ", ")
 for item in items:
     print("Item: {item}")
+
+
+# ----------------------------------------------------
+# dynamic member test
+# ----------------------------------------------------
+print("--- dynamic member test ---")
+
+# creating an array
+var inventory = ["sword", "shield"]
+print("Initial length: {inventory.length}")
+
+# adding items
+inventory.push("health potion")
+print("New length: {inventory.length}")
+
+# iterating over an array
+for item in inventory:
+    print("Item: {item}")
+
+# removing items
+var removed = inventory.pop()
+print("Popped: {removed}")
+
+# method chaining
+var name = "  Gabriel Aplok  "
+print(name.trim().to_upper())
+
+# dynamic member access
+var player = {"score": 0}
+player.score = player.score + 50
+print("Score: {player.score}")

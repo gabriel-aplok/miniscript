@@ -194,6 +194,7 @@ public class Interpreter
             ArrayExpr a => EvaluateArray(a),
             IndexExpr i => EvaluateIndex(i),
             DictionaryExpr d => EvaluateDictionary(d),
+            SetPropertyExpr s => EvaluateSetProperty(s),
             SetExpr s => EvaluateSet(s),
             GetExpr g => EvaluateGet(g),
             _ => throw new NotImplementedException(),
@@ -326,6 +327,23 @@ public class Interpreter
         return dict;
     }
 
+    private object? EvaluateSetProperty(SetPropertyExpr expr)
+    {
+        object? obj = Evaluate(expr.Object);
+
+        if (obj is Dictionary<object, object?> dict)
+        {
+            object? value = Evaluate(expr.Value);
+            dict[expr.Name.Lexeme] = value;
+            return value;
+        }
+
+        throw new RuntimeException(
+            expr.Name,
+            "Only dictionariess support property assignment via dot notation."
+        );
+    }
+
     private object? EvaluateSet(SetExpr expr)
     {
         object? callee = Evaluate(expr.Callee);
@@ -360,21 +378,85 @@ public class Interpreter
     {
         object? obj = Evaluate(expr.Object);
 
+        // list methods
+        if (obj is List<object?> list)
+        {
+            return expr.Name.Lexeme switch
+            {
+                "length" => (double)list.Count,
+                "push" => new BuiltinFunction(
+                    1,
+                    args =>
+                    {
+                        list.Add(args[0]);
+                        return null;
+                    }
+                ),
+                "remove" => new BuiltinFunction(1, args => list.Remove(args[0])),
+                "pop" => new BuiltinFunction(
+                    0,
+                    _ =>
+                    {
+                        object? last = list[^1];
+                        list.RemoveAt(list.Count - 1);
+                        return last;
+                    }
+                ),
+                "clear" => new BuiltinFunction(
+                    0,
+                    _ =>
+                    {
+                        list.Clear();
+                        return null;
+                    }
+                ),
+                _ => throw new RuntimeException(
+                    expr.Name,
+                    $"List has no method '{expr.Name.Lexeme}'."
+                ),
+            };
+        }
+
+        // string methods
+        if (obj is string str)
+        {
+            return expr.Name.Lexeme switch
+            {
+                "length" => (double)str.Length,
+                "to_upper" => new BuiltinFunction(0, _ => str.ToUpper()),
+                "to_lower" => new BuiltinFunction(0, _ => str.ToLower()),
+                "trim" => new BuiltinFunction(0, _ => str.Trim()),
+                "contains" => new BuiltinFunction(
+                    1,
+                    args => str.Contains(args[0]?.ToString() ?? "")
+                ),
+                _ => throw new RuntimeException(
+                    expr.Name,
+                    $"String has no method '{expr.Name.Lexeme}'."
+                ),
+            };
+        }
+
+        // dictionary properties
         if (obj is Dictionary<object, object?> dict)
         {
-            if (dict.TryGetValue(expr.Name.Lexeme, out var value))
+            if (dict.TryGetValue(expr.Name.Lexeme, out object? value))
             {
                 return value;
             }
-            throw new RuntimeException(
-                expr.Name,
-                $"Property '{expr.Name.Lexeme}' not found in dictionary."
-            );
+
+            // dynamic method for dictionaries
+            if (expr.Name.Lexeme == "keys")
+            {
+                return new BuiltinFunction(0, _ => dict.Keys.ToList<object?>());
+            }
+
+            throw new RuntimeException(expr.Name, $"Property '{expr.Name.Lexeme}' not found.");
         }
 
         throw new RuntimeException(
             expr.Name,
-            "Only dictionaries (and modules) support dot notation access."
+            "Only collections and strings support member access."
         );
     }
 
