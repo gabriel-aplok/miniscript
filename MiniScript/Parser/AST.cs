@@ -25,6 +25,10 @@ public record ArrayExpr(List<Expr> Elements) : Expr;
 
 public record IndexExpr(Expr Callee, Token Bracket, Expr Index) : Expr;
 
+public record DictionaryExpr(Dictionary<Expr, Expr> Entries) : Expr;
+
+public record SetExpr(Expr Callee, Token Bracket, Expr Index, Expr Value) : Expr;
+
 // statements
 public abstract record Stmt;
 

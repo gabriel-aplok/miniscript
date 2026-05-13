@@ -12,6 +12,8 @@ public enum TokenType
     Slash,
     Modulo,
     Colon,
+    LeftBrace,
+    RightBrace,
     LeftBracket,
     RightBracket,
 

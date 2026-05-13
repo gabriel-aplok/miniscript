@@ -169,12 +169,21 @@ public class Parser(List<Token> tokens)
         {
             Token equals = Previous();
             Expr value = Assignment();
+
             if (expr is VariableExpr v)
             {
                 return new AssignExpr(v.Name, value);
             }
+
+            // handle index assignment: arr[index] = value
+            if (expr is IndexExpr i)
+            {
+                return new SetExpr(i.Callee, i.Bracket, i.Index, value);
+            }
+
             throw new ParserException(equals, "Invalid assignment target.");
         }
+
         return expr;
     }
 
@@ -351,6 +360,24 @@ public class Parser(List<Token> tokens)
 
             Consume(TokenType.RightBracket, "Expect ']' after array elements.");
             return new ArrayExpr(elements);
+        }
+
+        if (Match(TokenType.LeftBrace))
+        {
+            Dictionary<Expr, Expr> entries = [];
+            if (!Check(TokenType.RightBrace))
+            {
+                do
+                {
+                    Expr key = Expression();
+                    Consume(TokenType.Colon, "Expect ':' after dictionary key.");
+                    Expr val = Expression();
+                    entries.Add(key, val);
+                } while (Match(TokenType.Comma));
+            }
+
+            Consume(TokenType.RightBrace, "Expect '}' after dictionary entries.");
+            return new DictionaryExpr(entries);
         }
 
         if (Match(TokenType.Identifier))

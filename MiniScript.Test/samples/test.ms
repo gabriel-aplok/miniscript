@@ -124,3 +124,26 @@ print("matrix 1,0: {matrix[1][0]}")
 # len test
 var array = [1, 2, 3, 4, 5]
 print("array length: {len(array)}")
+
+# array modification
+var my_list = [1, 2, 3]
+my_list[0] = 100
+print("list item: {my_list[0]}") # should print 100
+
+# dictionary usage
+# [Parser Error] Line 134:16 -> Unexpected token Newline
+# var player = {
+#     "name": "gabriel",
+#     "health": 100,
+#     "inventory": ["item1", "item2", "item3"]
+# }
+
+# print("welcome {player["name"]}")
+
+# # dictionary modification
+# player["health"] = player["health"] - 20
+# print("current health: {player["health"]}")
+
+# # adding new keys
+# player["mana"] = 50
+# print("mana added: {player["mana"]}")

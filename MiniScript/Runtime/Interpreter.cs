@@ -43,7 +43,11 @@ public class Interpreter
             "sqrt",
             new BuiltinFunction(1, args => Math.Sqrt(Convert.ToDouble(args[0])))
         );
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
         Globals.Define("len", new BuiltinFunction(1, args => ((List<object?>)args[0]).Count));
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
     }
 
     public void Interpret(List<Stmt> statements)
@@ -117,8 +121,6 @@ public class Interpreter
     {
         return expr switch
         {
-            ArrayExpr a => EvaluateArray(a),
-            IndexExpr i => EvaluateIndex(i),
             AssignExpr a => EvaluateAssign(a),
             BinaryExpr b => EvaluateBinary(b),
             CallExpr c => EvaluateCall(c),
@@ -127,43 +129,12 @@ public class Interpreter
             UnaryExpr u => EvaluateUnary(u),
             VariableExpr v => _environment.Get(v.Name),
             InterpolatedStringExpr i => EvaluateInterpolation(i),
+            ArrayExpr a => EvaluateArray(a),
+            IndexExpr i => EvaluateIndex(i),
+            DictionaryExpr d => EvaluateDictionary(d),
+            SetExpr s => EvaluateSet(s),
             _ => throw new NotImplementedException(),
         };
-    }
-
-    private object? EvaluateArray(ArrayExpr expr)
-    {
-        List<object?> elements = [];
-        foreach (Expr element in expr.Elements)
-        {
-            elements.Add(Evaluate(element));
-        }
-        return elements;
-    }
-
-    private object? EvaluateIndex(IndexExpr expr)
-    {
-        object? callee = Evaluate(expr.Callee);
-        object? indexObj = Evaluate(expr.Index);
-
-        if (callee is List<object?> list)
-        {
-            if (indexObj is double indexDouble)
-            {
-                int index = (int)indexDouble;
-                if (index < 0 || index >= list.Count)
-                {
-                    throw new RuntimeException(
-                        expr.Bracket,
-                        $"Index out of bounds: {index} for list of size {list.Count}"
-                    );
-                }
-                return list[index];
-            }
-            throw new RuntimeException(expr.Bracket, "Index must be a number.");
-        }
-
-        throw new RuntimeException(expr.Bracket, "Only arrays can be indexed.");
     }
 
     private object? EvaluateAssign(AssignExpr a)
@@ -243,6 +214,81 @@ public class Interpreter
         }
 
         return builder.ToString();
+    }
+
+    private object? EvaluateArray(ArrayExpr expr)
+    {
+        List<object?> elements = [];
+        foreach (Expr element in expr.Elements)
+        {
+            elements.Add(Evaluate(element));
+        }
+        return elements;
+    }
+
+    private object? EvaluateIndex(IndexExpr expr)
+    {
+        object? callee = Evaluate(expr.Callee);
+        object? index = Evaluate(expr.Index);
+
+        if (callee is List<object?> list)
+        {
+            int i = (int)(double)index!;
+            return list[i];
+        }
+        if (callee is Dictionary<object, object?> dict)
+        {
+            if (index != null && dict.TryGetValue(index, out var value))
+            {
+                return value;
+            }
+
+            return null;
+        }
+        throw new RuntimeException(expr.Bracket, "Only arrays and dictionaries can be indexed.");
+    }
+
+    private object? EvaluateDictionary(DictionaryExpr expr)
+    {
+        Dictionary<object, object?> dict = [];
+        foreach (KeyValuePair<Expr, Expr> entry in expr.Entries)
+        {
+            object? key =
+                Evaluate(entry.Key)
+                ?? throw new RuntimeException(null, "Dictionary key cannot be null.");
+            dict[key] = Evaluate(entry.Value);
+        }
+        return dict;
+    }
+
+    private object? EvaluateSet(SetExpr expr)
+    {
+        object? callee = Evaluate(expr.Callee);
+        object? index = Evaluate(expr.Index);
+        object? value = Evaluate(expr.Value);
+
+        if (callee is List<object?> list)
+        {
+            int i = (int)(double)index!;
+            list[i] = value;
+            return value;
+        }
+
+        if (callee is Dictionary<object, object?> dict)
+        {
+            if (index == null)
+            {
+                throw new RuntimeException(expr.Bracket, "Key cannot be null.");
+            }
+
+            dict[index] = value;
+            return value;
+        }
+
+        throw new RuntimeException(
+            expr.Bracket,
+            "Only arrays and dictionaries support index assignment."
+        );
     }
 
     private object? EvaluateBinary(BinaryExpr b)
