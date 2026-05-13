@@ -43,7 +43,7 @@ public class Interpreter
             "sqrt",
             new BuiltinFunction(1, args => Math.Sqrt(Convert.ToDouble(args[0])))
         );
-        Globals.Define("len", new BuiltinFunction(1, args => ((string)args[0]).Length));
+        Globals.Define("len", new BuiltinFunction(1, args => ((List<object?>)args[0]).Count));
     }
 
     public void Interpret(List<Stmt> statements)

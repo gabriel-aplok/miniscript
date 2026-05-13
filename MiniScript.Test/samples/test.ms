@@ -120,3 +120,7 @@ print("dynamic index: {fruits[i]}")
 var matrix = [[1, 2], [3, 4]]
 print("matrix 0,0: {matrix[0][0]}")
 print("matrix 1,0: {matrix[1][0]}")
+
+# len test
+var array = [1, 2, 3, 4, 5]
+print("array length: {len(array)}")

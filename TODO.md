@@ -1,4 +1,4 @@
-# miniscript development roadmap
+# miniscript based on gdscript development roadmap
 
 ## high priority
 
