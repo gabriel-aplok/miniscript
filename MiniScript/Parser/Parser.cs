@@ -93,6 +93,11 @@ public class Parser(List<Token> tokens)
             return ReturnStatement();
         }
 
+        if (Match(TokenType.Try))
+        {
+            return TryStatement();
+        }
+
         if (Match(TokenType.Import))
         {
             return ImportStatement();
@@ -152,6 +157,27 @@ public class Parser(List<Token> tokens)
 
         ConsumeNewlineOrEOF("Expect newline after return value.");
         return new ReturnStmt(keyword, value);
+    }
+
+    private Stmt TryStatement()
+    {
+        Consume(TokenType.Colon, "Expect ':' after 'try'.");
+        Consume(TokenType.Newline, "Expect newline after ':'.");
+        Stmt tryBlock = Block();
+
+        Consume(TokenType.Catch, "Expect 'catch' after try block.");
+
+        Token? errorVar = null;
+        if (Match(TokenType.Identifier))
+        {
+            errorVar = Previous();
+        }
+
+        Consume(TokenType.Colon, "Expect ':' after catch.");
+        Consume(TokenType.Newline, "Expect newline after ':'.");
+        Stmt catchBlock = Block();
+
+        return new TryStmt(tryBlock, errorVar, catchBlock);
     }
 
     private Stmt ImportStatement()

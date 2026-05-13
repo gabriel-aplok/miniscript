@@ -28,6 +28,8 @@ public class Scanner(string source)
         { "false", TokenType.False },
         { "null", TokenType.Null },
         { "var", TokenType.Var },
+        { "try", TokenType.Try },
+        { "catch", TokenType.Catch },
         { "import", TokenType.Import },
     };
 

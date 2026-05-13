@@ -53,3 +53,5 @@ public record VarStmt(Token Name, Expr? Initializer) : Stmt;
 public record WhileStmt(Expr Condition, Stmt Body) : Stmt;
 
 public record ForStmt(Token Variable, Expr Iterable, Stmt Body) : Stmt;
+
+public record TryStmt(Stmt TryBlock, Token? ErrorVar, Stmt CatchBlock) : Stmt;

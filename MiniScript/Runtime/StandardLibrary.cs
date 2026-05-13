@@ -5,6 +5,33 @@ public static class StandardLibrary
     public static void Inject(Interpreter interpreter)
     {
         // ----------------------------------------------------
+        // MEMORY LIBRARY
+        // ----------------------------------------------------
+        Dictionary<object, object?> memoryLib = new()
+        {
+            // returns the current memory usage in MB.
+            ["usage"] = new BuiltinFunction(
+                0,
+                _ =>
+                {
+                    return (double)GC.GetTotalMemory(false) / (1024 * 1024);
+                }
+            ),
+
+            // suggests that .NET run the garbage collector now.
+            ["collect"] = new BuiltinFunction(
+                0,
+                _ =>
+                {
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    return null;
+                }
+            ),
+        };
+        interpreter.Globals.Define("memory", memoryLib);
+
+        // ----------------------------------------------------
         // MATH LIBRARY
         // ----------------------------------------------------
         Dictionary<object, object?> mathLib = new()

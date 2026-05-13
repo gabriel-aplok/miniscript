@@ -6,7 +6,9 @@
 - [x] implement arrays/lists with index access
 - [x] implement dictionaries (key-value pairs)
 - [x] add for loops for iterating over collections
-- [ ] add garbage collection for memory management
+- [x] add garbage collection for memory management
+- [x] add try/catch for error handling
+- [x] add finally and throw for exception handling
 - [ ] port all the standard library functions from global to do notations
 
 ## cool features to add

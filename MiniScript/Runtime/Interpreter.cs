@@ -69,9 +69,6 @@ public class Interpreter
     {
         switch (stmt)
         {
-            case ImportStmt i:
-                ExecuteImport(i);
-                break;
             case BlockStmt b:
                 ExecuteBlock(b, new Environment(_environment));
                 break;
@@ -108,6 +105,12 @@ public class Interpreter
                 break;
             case ForStmt f:
                 ExecuteFor(f);
+                break;
+            case ImportStmt i:
+                ExecuteImport(i);
+                break;
+            case TryStmt t:
+                ExecuteTry(t);
                 break;
         }
     }
@@ -165,6 +168,36 @@ public class Interpreter
         finally
         {
             _currentDirectory = previousDir; // restore the original directory
+        }
+    }
+
+    private void ExecuteTry(TryStmt stmt)
+    {
+        try
+        {
+            Execute(stmt.TryBlock);
+        }
+        catch (RuntimeException ex)
+        {
+            // creates a new scope for the catch block.
+            Environment catchEnv = new(_environment);
+
+            if (stmt.ErrorVar != null)
+            {
+                // define the error variable with the exception message.
+                catchEnv.Define(stmt.ErrorVar.Lexeme, ex.Message);
+            }
+
+            Environment previous = _environment;
+            try
+            {
+                _environment = catchEnv;
+                Execute(stmt.CatchBlock);
+            }
+            finally
+            {
+                _environment = previous;
+            }
         }
     }
 

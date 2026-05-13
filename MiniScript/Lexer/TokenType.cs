@@ -48,6 +48,8 @@ public enum TokenType
     False,
     Null,
     Var,
+    Try,
+    Catch,
 
     // formatting & structure
     Indent,

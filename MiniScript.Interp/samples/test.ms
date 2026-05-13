@@ -269,3 +269,22 @@ print(name.trim().to_upper())
 var player = {"score": 0}
 player.score = player.score + 50
 print("Score: {player.score}")
+
+
+# ----------------------------------------------------
+# try/catch test
+# ----------------------------------------------------
+print("--- try/catch test ---")
+
+try:
+    var result = 10 / 0 # this should generate an error.
+    print(result)
+catch e:
+    print("an error occurred: {e}")
+
+try:
+    import "unexistent.ms"
+catch err:
+    print("Import error: {err}")
+
+print("the program continued running fine!")
