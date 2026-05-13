@@ -21,7 +21,8 @@ public class Program
         }
         else
         {
-            RunPrompt();
+            // just to test lol RunPrompt();
+            RunFile("samples/test.ms");
         }
     }
 
