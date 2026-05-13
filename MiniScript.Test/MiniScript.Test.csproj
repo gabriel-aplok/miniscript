@@ -4,8 +4,8 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>net8.0</TargetFramework>
         <LangVersion>12.0</LangVersion>
-        <RootNamespace>MiniScript</RootNamespace>
-        <AssemblyName>MiniScript</AssemblyName>
+        <RootNamespace>MiniScript.Test</RootNamespace>
+        <AssemblyName>ms.test</AssemblyName>
 
         <!-- compilation -->
         <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
@@ -63,10 +63,15 @@
 
     <!-- example resources -->
     <ItemGroup>
-        <Content Include="Samples/**/*">
+        <Content Include="samples/**/*">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
 
-        <None Include="README.md" Pack="true" PackagePath="\" />
+        <None Include="../README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\MiniScript.Raylib\MiniScript.Raylib.csproj" />
+        <ProjectReference Include="..\MiniScript\MiniScript.csproj" />
     </ItemGroup>
 </Project>

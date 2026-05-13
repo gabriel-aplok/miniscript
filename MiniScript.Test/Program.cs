@@ -2,7 +2,7 @@
 using MiniScript.Parser;
 using MiniScript.Runtime;
 
-namespace MiniScript;
+namespace MiniScript.Test;
 
 public class Program
 {
@@ -33,7 +33,7 @@ public class Program
 
     private static void RunPrompt()
     {
-        Console.WriteLine("MiniScript REPL (.NET 8)");
+        Console.WriteLine("MiniScript REPL");
         Console.WriteLine(
             "Note: Single-line statements only in REPL. Blocks (if/func/while) require file execution."
         );

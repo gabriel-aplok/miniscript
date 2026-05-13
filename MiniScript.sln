@@ -2,7 +2,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniScript", "MiniScript.csproj", "{2354C70B-3141-251D-8B41-D8F7FCB1F308}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniScript", "MiniScript\MiniScript.csproj", "{2354C70B-3141-251D-8B41-D8F7FCB1F308}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniScript.Test", "MiniScript.Test\MiniScript.Test.csproj", "{8DC6CDAD-88AF-4C67-88FA-B4E8552C5DE3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniScript.Raylib", "MiniScript.Raylib\MiniScript.Raylib.csproj", "{DBD15735-BFB4-4FA2-8D44-BF5AD2138DD4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,6 +18,14 @@ Global
 		{2354C70B-3141-251D-8B41-D8F7FCB1F308}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2354C70B-3141-251D-8B41-D8F7FCB1F308}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2354C70B-3141-251D-8B41-D8F7FCB1F308}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8DC6CDAD-88AF-4C67-88FA-B4E8552C5DE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DC6CDAD-88AF-4C67-88FA-B4E8552C5DE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DC6CDAD-88AF-4C67-88FA-B4E8552C5DE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DC6CDAD-88AF-4C67-88FA-B4E8552C5DE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBD15735-BFB4-4FA2-8D44-BF5AD2138DD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBD15735-BFB4-4FA2-8D44-BF5AD2138DD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBD15735-BFB4-4FA2-8D44-BF5AD2138DD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBD15735-BFB4-4FA2-8D44-BF5AD2138DD4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
