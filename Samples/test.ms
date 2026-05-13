@@ -76,3 +76,8 @@ print(fib(5))
 # built-in functions
 print("--- current time ---")
 print(clock())
+
+print("--- input ---")
+print("enter your name:")
+var name = input()
+print("hello " + name)

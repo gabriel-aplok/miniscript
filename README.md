@@ -8,11 +8,11 @@ miniscript is a lightweight, indentation-based scripting language inspired by gd
 - dynamic typing (numbers, strings, booleans, null)
 - first-class functions and closures
 - while loops and if/else statements
-- built-in functions like `print()` and `clock()`
+- built-in functions like `print()`, `input()` and `clock()`
 
 ## architecture
 
-the project is divided into several modular components:
+the project is divided into modular components:
 
 - **lexer**: converts raw text into tokens while tracking indentation levels.
 - **parser**: a recursive descent parser that builds an abstract syntax tree (ast).
