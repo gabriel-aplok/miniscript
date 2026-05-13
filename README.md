@@ -8,7 +8,7 @@ miniscript is a lightweight, indentation-based scripting language inspired by gd
 - dynamic typing (numbers, strings, booleans, null)
 - first-class functions and closures
 - while loops and if/else statements
-- built-in functions like `print()`, `input()` and `clock()`
+- built-in functions with standard library support.
 
 ## architecture
 
@@ -23,7 +23,7 @@ the project is divided into modular components:
 
 1. ensure you have the .net 8 sdk installed.
 2. clone the repo and run the repl:
-   `dotnet run`
+   `dotnet run -- -r`
 3. or run a specific script:
    `dotnet run -- example.ms`
 
@@ -38,6 +38,8 @@ while count < 3:
     greet("developer")
     count = count + 1
 ```
+
+you can see more examples in the `MiniScript.Interp/samples` folder.
 
 ## license
 
