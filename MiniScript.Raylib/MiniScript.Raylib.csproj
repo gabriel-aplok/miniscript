@@ -4,7 +4,7 @@
         <TargetFramework>net8.0</TargetFramework>
         <LangVersion>12.0</LangVersion>
         <RootNamespace>MiniScript.Raylib</RootNamespace>
-        <AssemblyName>ms.raylib</AssemblyName>
+        <AssemblyName>msrl</AssemblyName>
 
         <!-- compilation -->
         <AllowUnsafeBlocks>false</AllowUnsafeBlocks>

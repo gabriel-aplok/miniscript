@@ -4,7 +4,7 @@ using MiniScript.Lexer;
 using MiniScript.Parser;
 using MiniScript.Runtime;
 
-namespace MiniScript.Test;
+namespace MiniScript.Interp;
 
 public class Program
 {

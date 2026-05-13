@@ -32,4 +32,4 @@ jobs:
         run: dotnet build -c Release --no-restore
 
       - name: List Packages
-        run: ls -R MiniScript.Test/bin/Release/
+        run: ls -R MiniScript.Interp/bin/Release/
