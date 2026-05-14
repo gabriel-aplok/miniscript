@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using MiniScript.Errors;
 using MiniScript.Lexer;
 using MiniScript.Parser;
@@ -123,15 +124,21 @@ public class Program
 
     private static void Run(string source, string? path = null)
     {
+        // Start the metrics
+        Stopwatch sw = Stopwatch.StartNew();
+        long startMemory = GC.GetTotalMemory(false);
+
         try
         {
             // lexing
             Scanner scanner = new(source);
             List<Token> tokens = scanner.ScanTokens();
+            int tokenCount = tokens.Count;
 
             // parsing
             Parser.Parser parser = new(tokens);
             List<Stmt> statements = parser.Parse();
+            int statementCount = statements.Count;
 
             // stop if there was a syntax error
             if (_hadError)
@@ -141,6 +148,13 @@ public class Program
 
             // execution
             _interpreter.Run(statements, path);
+
+            sw.Stop();
+
+            // ----------------------------------------------------
+            // PROFILING REPORT
+            // ----------------------------------------------------
+            PrintProfiling(sw.Elapsed, tokenCount, statementCount, startMemory);
         }
         catch (RuntimeException ex)
         {
@@ -159,6 +173,33 @@ public class Program
             Console.WriteLine(ex.StackTrace);
             Console.ResetColor();
         }
+    }
+
+    private static void PrintProfiling(TimeSpan elapsed, int tokens, int stmts, long startMem)
+    {
+        long endMem = GC.GetTotalMemory(false);
+        double memUsedMB = (endMem - startMem) / 1024.0 / 1024.0;
+        int vars = _interpreter.Globals.VariableCount;
+
+        Console.WriteLine("\n" + new string('=', 40));
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine("        MINISCRIPT PROFILING");
+        Console.ResetColor();
+        Console.WriteLine(new string('-', 40));
+
+        Console.WriteLine($"  Execution Time   : {elapsed.TotalMilliseconds:F2}ms");
+        Console.WriteLine($"  Tokens Processed : {tokens}");
+        Console.WriteLine($"  Statements (AST) : {stmts}");
+        Console.WriteLine($"  Active Variables : {vars}");
+        Console.WriteLine($"  Memory Usage     : {memUsedMB:F4} MB");
+
+        if (elapsed.TotalMilliseconds > 0)
+        {
+            double speed = stmts / elapsed.TotalSeconds;
+            Console.WriteLine($"  Speed             : {speed:F0} stmts/sec");
+        }
+
+        Console.WriteLine(new string('=', 40) + "\n");
     }
 
     private static void PrintUsage()

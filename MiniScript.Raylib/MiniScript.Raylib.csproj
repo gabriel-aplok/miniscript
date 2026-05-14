@@ -17,6 +17,10 @@
         <Deterministic>true</Deterministic>
         <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
 
+        <!-- publishing -->
+        <SelfContained>true</SelfContained>
+        <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+
         <!-- performance -->
         <Optimize>true</Optimize>
         <TieredCompilation>true</TieredCompilation>
@@ -27,10 +31,6 @@
         <PublishTrimmed>true</PublishTrimmed>
         <TrimMode>partial</TrimMode>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-
-        <!-- aot -->
-        <PublishAot>true</PublishAot>
-        <IsAotCompatible>true</IsAotCompatible>
 
         <!-- globalization -->
         <InvariantGlobalization>true</InvariantGlobalization>

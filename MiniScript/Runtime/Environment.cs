@@ -6,6 +6,8 @@ namespace MiniScript.Runtime;
 public class Environment(Environment? enclosing = null)
 {
     public Environment? Enclosing { get; } = enclosing;
+    public int VariableCount => _values.Count + (Enclosing?.VariableCount ?? 0);
+
     private readonly Dictionary<string, object?> _values = [];
 
     public void Define(string name, object? value)

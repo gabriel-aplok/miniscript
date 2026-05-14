@@ -23,14 +23,14 @@
         <TieredPGO>true</TieredPGO>
         <ReadyToRun>true</ReadyToRun>
 
+        <!-- publishing -->
+        <SelfContained>true</SelfContained>
+        <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+
         <!-- trimming -->
         <PublishTrimmed>true</PublishTrimmed>
         <TrimMode>partial</TrimMode>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-
-        <!-- aot -->
-        <PublishAot>true</PublishAot>
-        <IsAotCompatible>true</IsAotCompatible>
 
         <!-- globalization -->
         <InvariantGlobalization>true</InvariantGlobalization>
