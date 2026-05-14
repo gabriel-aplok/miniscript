@@ -10,34 +10,32 @@ public class Program
 {
     private static readonly Interpreter _interpreter = new();
     private static bool _hadError = false;
-    private static readonly bool _hadRuntimeError = false;
+    private static bool _hadRuntimeError = false;
 
     public static int Main(string[] args)
     {
         Console.OutputEncoding = Encoding.UTF8;
 
-        // handle no arguments
         if (args.Length == 0)
         {
-            // if a default test file exists, run it, otherwise start REPL
             if (File.Exists("samples/test.ms"))
             {
-                RunFile("samples/test.ms");
+                RunFile("samples/test.ms", []);
             }
             else
             {
                 RunPrompt();
             }
-
             return 0;
         }
 
-        // parse arguments properly
         string? filePath = null;
         bool startRepl = false;
+        List<string> scriptArgs = [];
 
-        foreach (string arg in args)
+        for (int i = 0; i < args.Length; i++)
         {
+            string arg = args[i];
             switch (arg)
             {
                 case "-r":
@@ -49,27 +47,27 @@ public class Program
                     PrintUsage();
                     return 0;
                 default:
-                    if (!arg.StartsWith('-'))
+                    if (!arg.StartsWith('-') && filePath == null)
                     {
                         filePath = arg;
+                        scriptArgs = [.. args.Skip(i + 1)];
+                        i = args.Length;
                     }
-
                     break;
             }
         }
 
-        // execution priority
         if (startRepl)
         {
             RunPrompt();
         }
         else if (filePath != null)
         {
-            RunFile(filePath);
+            RunFile(filePath, scriptArgs);
         }
         else
         {
-            Console.Error.WriteLine("Error: No script file provided and REPL flag not set.");
+            Console.Error.WriteLine("Error: No script file provided.");
             PrintUsage();
             return 64;
         }
@@ -77,16 +75,7 @@ public class Program
         return _hadError ? 65 : (_hadRuntimeError ? 70 : 0);
     }
 
-    private static void PrintUsage()
-    {
-        Console.WriteLine("MiniScript Language Tool");
-        Console.WriteLine("Usage: MiniScript [script.ms] [options]");
-        Console.WriteLine("\nOptions:");
-        Console.WriteLine("  -r, --repl    Start interactive mode");
-        Console.WriteLine("  -h, --help    Show this help message");
-    }
-
-    private static void RunFile(string path)
+    private static void RunFile(string path, List<string> args)
     {
         if (!File.Exists(path))
         {
@@ -96,6 +85,7 @@ public class Program
 
         try
         {
+            _interpreter.Arguments = args;
             string source = File.ReadAllText(path);
             Run(source, path);
         }
@@ -112,9 +102,11 @@ public class Program
         Console.WriteLine("Type 'exit()' or press Ctrl+C to quit.");
         Console.WriteLine("-------------------------------------");
 
+        _interpreter.Arguments = [];
+
         while (true)
         {
-            _hadError = false; // reset error flag so REPL doesn't die
+            _hadError = false;
             Console.ForegroundColor = ConsoleColor.Green;
             Console.Write("ms > ");
             Console.ResetColor();
@@ -150,6 +142,11 @@ public class Program
             // execution
             _interpreter.Run(statements, path);
         }
+        catch (RuntimeException ex)
+        {
+            ReportError(source, ex);
+            _hadRuntimeError = true;
+        }
         catch (MiniScriptException ex)
         {
             ReportError(source, ex);
@@ -162,6 +159,15 @@ public class Program
             Console.WriteLine(ex.StackTrace);
             Console.ResetColor();
         }
+    }
+
+    private static void PrintUsage()
+    {
+        Console.WriteLine("MiniScript Language Tool");
+        Console.WriteLine("Usage: MiniScript [script.ms] [options]");
+        Console.WriteLine("\nOptions:");
+        Console.WriteLine("  -r, --repl    Start interactive mode");
+        Console.WriteLine("  -h, --help    Show this help message");
     }
 
     private static void ReportError(string source, MiniScriptException ex)

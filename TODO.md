@@ -10,6 +10,7 @@
 - [x] add try/catch for error handling
 - [x] add finally and throw for exception handling
 - [ ] port all the standard library functions from global to do notations
+- [ ] implement compound assignment operators (+=, -=, \*=, /=, %=)
 
 ## cool features to add
 

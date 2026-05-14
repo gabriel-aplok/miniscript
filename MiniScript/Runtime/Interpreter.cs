@@ -8,10 +8,12 @@ namespace MiniScript.Runtime;
 public class Interpreter
 {
     public Environment Globals { get; } = new();
-    private Environment _environment;
+    public string CurrentDirectory => _currentDirectory;
+    public List<string> Arguments { get; set; } = [];
 
-    private readonly HashSet<string> _importedFiles = [];
+    private Environment _environment;
     private string _currentDirectory = Directory.GetCurrentDirectory();
+    private readonly HashSet<string> _importedFiles = [];
 
     public Interpreter()
     {

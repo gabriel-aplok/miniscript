@@ -308,3 +308,40 @@ finally:
 
 
 print("the program continued running fine!")
+
+
+# ----------------------------------------------------
+# OS & IO tests
+# ----------------------------------------------------
+print("--- OS & IO Test ---")
+
+# getting env vars
+var user = os.getenv("USERNAME")
+if user == null:
+    user = os.getenv("USER") # Linux/Mac support
+
+print("hello, system user: {user}")
+print("platform: {os.platform}")
+print("script directory: {os.cwd()}")
+
+# working with files
+var filename = "data.txt"
+var content = "this is a secret message for {user}.\n"
+
+print("writing to {filename}...")
+io.write(filename, content)
+
+if io.exists(filename):
+    print("file content:")
+    print(io.read(filename))
+
+    # append
+    io.append(filename, "added at: {clock()}\n")
+    print("updated content:")
+    print(io.read(filename))
+
+# error handling
+# try:
+#     io.read("non_existent_file.txt")
+# catch e:
+#     print("Safe! Caught IO error: {e")

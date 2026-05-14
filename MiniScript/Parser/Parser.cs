@@ -400,7 +400,7 @@ public class Parser(List<Token> tokens)
         return expr;
     }
 
-    private Expr FinishCall(Expr callee)
+    private CallExpr FinishCall(Expr callee)
     {
         List<Expr> arguments = [];
         if (!Check(TokenType.RightParen))

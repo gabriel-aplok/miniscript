@@ -119,5 +119,109 @@ public static class StandardLibrary
             ),
         };
         interpreter.Globals.Define("string", stringLib);
+
+        // ----------------------------------------------------
+        // IO LIBRARY
+        // ----------------------------------------------------
+        Dictionary<object, object?> ioLib = new()
+        {
+            ["exists"] = new BuiltinFunction(
+                1,
+                args =>
+                {
+                    string path = Path.Combine(
+                        interpreter.CurrentDirectory,
+                        args[0]?.ToString() ?? ""
+                    );
+                    return File.Exists(path);
+                }
+            ),
+            ["read"] = new BuiltinFunction(
+                1,
+                args =>
+                {
+                    string path = Path.Combine(
+                        interpreter.CurrentDirectory,
+                        args[0]?.ToString() ?? ""
+                    );
+                    return File.ReadAllText(path);
+                }
+            ),
+            ["write"] = new BuiltinFunction(
+                2,
+                args =>
+                {
+                    string path = Path.Combine(
+                        interpreter.CurrentDirectory,
+                        args[0]?.ToString() ?? ""
+                    );
+                    File.WriteAllText(path, args[1]?.ToString());
+                    return null;
+                }
+            ),
+            ["append"] = new BuiltinFunction(
+                2,
+                args =>
+                {
+                    string path = Path.Combine(
+                        interpreter.CurrentDirectory,
+                        args[0]?.ToString() ?? ""
+                    );
+                    File.AppendAllText(path, args[1]?.ToString());
+                    return null;
+                }
+            ),
+            ["remove"] = new BuiltinFunction(
+                1,
+                args =>
+                {
+                    string path = Path.Combine(
+                        interpreter.CurrentDirectory,
+                        args[0]?.ToString() ?? ""
+                    );
+                    if (File.Exists(path))
+                    {
+                        File.Delete(path);
+                    }
+
+                    return null;
+                }
+            ),
+        };
+        interpreter.Globals.Define("io", ioLib);
+
+        // ----------------------------------------------------
+        // OS LIBRARY
+        // ----------------------------------------------------
+        Dictionary<object, object?> osLib = new()
+        {
+            ["getenv"] = new BuiltinFunction(
+                1,
+                args => System.Environment.GetEnvironmentVariable(args[0]?.ToString() ?? "")
+            ),
+            ["setenv"] = new BuiltinFunction(
+                2,
+                args =>
+                {
+                    System.Environment.SetEnvironmentVariable(
+                        args[0]?.ToString() ?? "",
+                        args[1]?.ToString()
+                    );
+                    return null;
+                }
+            ),
+            ["cwd"] = new BuiltinFunction(0, _ => interpreter.CurrentDirectory),
+            ["platform"] = System.Environment.OSVersion.Platform.ToString(),
+            ["args"] = interpreter.Arguments.Cast<object?>().ToList(),
+            ["exit"] = new BuiltinFunction(
+                1,
+                args =>
+                {
+                    System.Environment.Exit(Convert.ToInt32(args[0]));
+                    return null;
+                }
+            ),
+        };
+        interpreter.Globals.Define("os", osLib);
     }
 }
