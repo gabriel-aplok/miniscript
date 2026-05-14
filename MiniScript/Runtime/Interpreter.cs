@@ -318,6 +318,7 @@ public class Interpreter
             SetPropertyExpr s => EvaluateSetProperty(s),
             SetExpr s => EvaluateSet(s),
             GetExpr g => EvaluateGet(g),
+            CompoundAssignExpr c => EvaluateCompoundAssign(c),
             _ => throw new NotImplementedException(),
         };
     }
@@ -327,6 +328,120 @@ public class Interpreter
         object? value = Evaluate(a.Value);
         _environment.Assign(a.Name, value);
         return value;
+    }
+
+    private object? EvaluateCompoundAssign(CompoundAssignExpr expr)
+    {
+        object? right = Evaluate(expr.Value);
+        object? left;
+
+        // obtain the current value based on the target type.
+        if (expr.Target is VariableExpr v)
+        {
+            left = _environment.Get(v.Name);
+        }
+        else if (expr.Target is IndexExpr i)
+        {
+            left = EvaluateIndex(i);
+        }
+        else if (expr.Target is GetExpr g)
+        {
+            left = EvaluateGet(g);
+        }
+        else
+        {
+            throw new RuntimeException(expr.Operator, "Alvo de atribuição composta inválido.");
+        }
+
+        // calculate the new value.
+        object? newValue = CalculateCompound(left, expr.Operator, right);
+
+        // Save back
+        if (expr.Target is VariableExpr varExpr)
+        {
+            _environment.Assign(varExpr.Name, newValue);
+        }
+        else if (expr.Target is IndexExpr idx)
+        {
+            ExecuteSetIndex(idx, newValue);
+        }
+        else if (expr.Target is GetExpr get)
+        {
+            ExecuteSetProperty(get.Object, get.Name, newValue);
+        }
+
+        return newValue;
+    }
+
+    private static object? CalculateCompound(object? left, Token op, object? right)
+    {
+        if (left is double l && right is double r)
+        {
+            return op.Type switch
+            {
+                TokenType.PlusEqual => l + r,
+                TokenType.MinusEqual => l - r,
+                TokenType.StarEqual => l * r,
+                TokenType.SlashEqual => l / r,
+                TokenType.ModuloEqual => l % r,
+                _ => throw new RuntimeException(op, "Unknown compound operator."),
+            };
+        }
+
+        // support for concatenating strings with +=
+        if (op.Type == TokenType.PlusEqual && left is string s)
+        {
+            return s + (right?.ToString() ?? "");
+        }
+
+        throw new RuntimeException(op, "Operands must be numbers for this operation.");
+    }
+
+    private void ExecuteSetIndex(IndexExpr expr, object? value)
+    {
+        object? callee = Evaluate(expr.Callee);
+        object? index = Evaluate(expr.Index);
+
+        if (callee is List<object?> list)
+        {
+            if (index is double d)
+            {
+                int idx = (int)d;
+                if (idx >= 0 && idx < list.Count)
+                {
+                    list[idx] = value;
+                    return;
+                }
+                throw new RuntimeException(expr.Bracket, "Index outside the list limits.");
+            }
+        }
+
+        if (callee is Dictionary<object, object?> dict)
+        {
+            if (index != null)
+            {
+                dict[index] = value;
+                return;
+            }
+        }
+
+        throw new RuntimeException(
+            expr.Bracket,
+            "Only lists and dictionaries support index-based assignment."
+        );
+    }
+
+    private void ExecuteSetProperty(Expr objExpr, Token name, object? value)
+    {
+        object? obj = Evaluate(objExpr);
+
+        if (obj is Dictionary<object, object?> dict)
+        {
+            dict[name.Lexeme] = value;
+            return;
+        }
+
+        throw new RuntimeException(name, "Only dictionaries support property assignment.");
     }
 
     private object? EvaluateCall(CallExpr c)

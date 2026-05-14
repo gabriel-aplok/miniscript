@@ -346,3 +346,24 @@ if io.exists(filename):
 #     io.read("non_existent_file.txt")
 # catch e:
 #     print("Safe! Caught IO error: {e")
+
+
+# ----------------------------------------------------
+# operator overloading test
+# ----------------------------------------------------
+print("--- operator overloading test ---")
+
+var score = 10
+score += 5
+print("Score: {score}") # 15
+
+var player = {"hp": 100}
+player.hp -= 20
+print("HP: {player.hp}") # 80
+
+# var inventory = ["sword"]
+# inventory.length += 0 # just testing, since length is read-only internally.
+
+var msg = "Hello"
+msg += " World"
+print(msg) # "Hello World"

@@ -7,6 +7,8 @@ public abstract record Expr;
 
 public record AssignExpr(Token Name, Expr Value) : Expr;
 
+public record CompoundAssignExpr(Expr Target, Token Operator, Expr Value) : Expr;
+
 public record BinaryExpr(Expr Left, Token Operator, Expr Right) : Expr;
 
 public record CallExpr(Expr Callee, Token Paren, List<Expr> Arguments) : Expr;

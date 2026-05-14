@@ -257,29 +257,44 @@ public class Parser(List<Token> tokens)
     {
         Expr expr = LogicalOr();
 
-        if (Match(TokenType.Equal))
+        if (
+            Match(
+                TokenType.Equal,
+                TokenType.PlusEqual,
+                TokenType.MinusEqual,
+                TokenType.StarEqual,
+                TokenType.SlashEqual,
+                TokenType.ModuloEqual
+            )
+        )
         {
-            Token equals = Previous();
+            Token op = Previous();
             Expr value = Assignment();
 
-            if (expr is VariableExpr v)
+            if (op.Type == TokenType.Equal)
             {
-                return new AssignExpr(v.Name, value);
+                if (expr is VariableExpr v)
+                {
+                    return new AssignExpr(v.Name, value);
+                }
+                if (expr is IndexExpr i)
+                {
+                    return new SetExpr(i.Callee, i.Bracket, i.Index, value);
+                }
+                if (expr is GetExpr g)
+                {
+                    return new SetPropertyExpr(g.Object, g.Name, value);
+                }
+            }
+            else
+            {
+                if (expr is VariableExpr || expr is IndexExpr || expr is GetExpr)
+                {
+                    return new CompoundAssignExpr(expr, op, value);
+                }
             }
 
-            // arr[index] = value
-            if (expr is IndexExpr i)
-            {
-                return new SetExpr(i.Callee, i.Bracket, i.Index, value);
-            }
-
-            // object.property = value
-            if (expr is GetExpr g)
-            {
-                return new SetPropertyExpr(g.Object, g.Name, value);
-            }
-
-            throw new ParserException(equals, "Invalid assignment target.");
+            throw new ParserException(op, "Invalid assignment target.");
         }
 
         return expr;

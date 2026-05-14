@@ -28,6 +28,13 @@ public enum TokenType
     Less,
     LessEqual,
 
+    //
+    PlusEqual,
+    MinusEqual,
+    StarEqual,
+    SlashEqual,
+    ModuloEqual,
+
     // literals
     Identifier,
     String,

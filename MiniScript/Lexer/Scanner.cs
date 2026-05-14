@@ -72,16 +72,16 @@ public class Scanner(string source)
                 AddToken(TokenType.Comma);
                 break;
             case '-':
-                AddToken(TokenType.Minus);
+                AddToken(Match('=') ? TokenType.MinusEqual : TokenType.Minus);
                 break;
             case '+':
-                AddToken(TokenType.Plus);
+                AddToken(Match('=') ? TokenType.PlusEqual : TokenType.Plus);
                 break;
             case '*':
-                AddToken(TokenType.Star);
+                AddToken(Match('=') ? TokenType.StarEqual : TokenType.Star);
                 break;
             case '%':
-                AddToken(TokenType.Modulo);
+                AddToken(Match('=') ? TokenType.ModuloEqual : TokenType.Modulo);
                 break;
             case ':':
                 AddToken(TokenType.Colon);
@@ -120,7 +120,7 @@ public class Scanner(string source)
                 }
                 else
                 {
-                    AddToken(TokenType.Slash);
+                    AddToken(Match('=') ? TokenType.SlashEqual : TokenType.Slash);
                 }
 
                 break;
