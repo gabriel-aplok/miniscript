@@ -2,8 +2,9 @@
 # I'm just testing out what I'm adding, sorry for the mass of random things.
 # ----------------------------------------------------
 
-import "utils.ms" # I put samples/ cuz the miniscript executor doesn't recognize the relative path and the script isn't in the same folder.
+import "utils.ms"
 
+# these things are from the utils file
 print(greet("Gabriel"))
 print("Running version: {version}")
 
